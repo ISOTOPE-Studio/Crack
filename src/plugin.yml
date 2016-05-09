@@ -1,0 +1,12 @@
+name: Crack
+main: cc.isotopestudio.Crack.Crack
+
+author: Mars
+description: Crack
+website: http://isotopestudio.cc
+version: 1.0.0
+commands:
+  CrackAdmin:
+    description: Crack Admin command
+    usage: /<command> - Get Information
+    aliases: cracka
