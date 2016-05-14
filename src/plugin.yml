@@ -10,3 +10,6 @@ commands:
     description: Crack Admin command
     usage: /<command> - Get Information
     aliases: cracka
+  Crack:
+    description: Crack command
+    usage: /<command> - Get Information

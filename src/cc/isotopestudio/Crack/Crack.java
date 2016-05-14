@@ -3,20 +3,21 @@ package cc.isotopestudio.Crack;
 import java.io.File;
 import java.io.IOException;
 
+import cc.isotopestudio.Crack.command.CrackCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import cc.isotopestudio.Crack.command.CrackAdminCommand;
-import cc.isotopestudio.Crack.data.Data;
 
 public class Crack extends JavaPlugin {
 	public static final String prefix = (new StringBuilder()).append(ChatColor.GOLD).append(ChatColor.BOLD).append("[")
 			.append("副本房间").append("]").append(ChatColor.GREEN).toString();
-	public static final String pluginName = "Crack";
+	private static final String pluginName = "Crack";
+	public static Crack plugin;
 
-	public void createFile(String name) {
+	private void createFile(String name) {
 		File file;
 		file = new File(getDataFolder(), name + ".yml");
 		if (!file.exists()) {
@@ -26,7 +27,7 @@ public class Crack extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		Data.plugin = this;
+        plugin = this;
 		createFile("config");
 		try {
 			getRoomData().save(roomDataFile);
@@ -36,6 +37,7 @@ public class Crack extends JavaPlugin {
 			return;
 		}
 		this.getCommand("CrackAdmin").setExecutor(new CrackAdminCommand());
+		this.getCommand("Crack").setExecutor(new CrackCommand());
 		getLogger().info(pluginName + "成功加载!");
 		getLogger().info(pluginName + "由ISOTOPE Studio制作!");
 		getLogger().info("http://isotopestudio.cc");
