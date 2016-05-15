@@ -1,29 +1,26 @@
 package cc.isotopestudio.Crack.gui;
 
+import cc.isotopestudio.Crack.data.PlayerData;
 import cc.isotopestudio.Crack.data.RoomData;
+import cc.isotopestudio.Crack.type.LocationType;
 import cc.isotopestudio.Crack.utli.S;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Set;
-
-/**
- * Created by Mars on 5/14/2016.
- */
 public class CrackGUI extends GUI {
     public CrackGUI() {
-        super(getName(S.toAqua("副本房间")), 9);
-        Set<String> rooms = plugin.getRoomData().getKeys(false);
+        super(getName(S.toAqua("副本房间")), 9 * 6);
         int count = 0;
-        for (String room : rooms) {
-            if (count > 8) break;
-            RoomData data = new RoomData(room);
-            if (!data.isFinish()) {
+        for (RoomData room : RoomData.rooms.values()) {
+            if (count > 9 * 6) break;
+            if (!room.isFinish()) {
                 continue;
             }
-            setOption(count, new ItemStack(Material.DIAMOND_SWORD), S.toAqua(data.getName()), S.toGreen("点击加入"));
+            setOption(count, new ItemStack(Material.DIAMOND_SWORD), S.toAqua(room.getName()), S.toGreen("点击加入"));
             count++;
         }
     }
@@ -31,8 +28,20 @@ public class CrackGUI extends GUI {
     @Override
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if(event.getInventory().getName().equals(name)){
+        if (event.getInventory().getName().equals(name)) {
             event.setCancelled(true);
+            Player player = (Player) event.getWhoClicked();
+            LocationType type = PlayerData.getLocation(player);
+            if (type == LocationType.NONE) {
+                PlayerData.teleport(player,
+                        RoomData.rooms.get(ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName())),
+                        LocationType.LOBBY);
+                player.sendMessage(S.toPrefixGreen("传送到游戏大厅"));
+            } else {
+                player.sendMessage(S.toPrefixGreen("你在游戏中"));
+            }
         }
     }
+
+
 }

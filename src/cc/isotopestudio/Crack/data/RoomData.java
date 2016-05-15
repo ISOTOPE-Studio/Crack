@@ -1,10 +1,10 @@
 package cc.isotopestudio.Crack.data;
 
-import org.bukkit.Bukkit;
+import cc.isotopestudio.Crack.utli.Utli;
 import org.bukkit.Location;
-import org.bukkit.World;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static cc.isotopestudio.Crack.Crack.plugin;
@@ -15,6 +15,15 @@ public class RoomData {
     private Location spawn;
     private Location respawn;
     private List<Location> mobSpawn;
+
+    public static HashMap<String, RoomData> rooms;
+
+    public static void update() {
+        rooms = new HashMap<>();
+        for (String room : plugin.getRoomData().getKeys(false)) {
+            rooms.put(room, new RoomData(room));
+        }
+    }
 
     public RoomData(String name) {
         this.name = name;
@@ -28,33 +37,16 @@ public class RoomData {
         respawn = getLocation("respawn");
         mobSpawn.clear();
         for (String line : plugin.getRoomData().getStringList(name + ".mobspawn")) {
-            String[] s = line.split(" ");
-            World world = Bukkit.getWorld(s[0]);
-            int x = Integer.parseInt(s[1]);
-            int y = Integer.parseInt(s[2]);
-            int z = Integer.parseInt(s[3]);
-            mobSpawn.add(new Location(world, x, y, z));
+            mobSpawn.add(Utli.stringToLocation(line));
         }
     }
 
     private Location getLocation(String key) {
-        String line = plugin.getRoomData().getString(name + "." + key, null);
-        if (line == null)
-            return null;
-        String[] s = line.split(" ");
-        World world = Bukkit.getWorld(s[0]);
-        int x = Integer.parseInt(s[1]);
-        int y = Integer.parseInt(s[2]);
-        int z = Integer.parseInt(s[3]);
-        return new Location(world, x, y, z);
-    }
-
-    private String locationToString(Location loc) {
-        return loc.getWorld().getName() + " " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ();
+        return Utli.stringToLocation(plugin.getRoomData().getString(name + "." + key, null));
     }
 
     private void storeLocation(String key, Location loc) {
-        plugin.getRoomData().set(name + "." + key, locationToString(loc));
+        plugin.getRoomData().set(name + "." + key, Utli.locationToString(loc));
         plugin.saveRoomData();
     }
 
@@ -96,14 +88,16 @@ public class RoomData {
     }
 
     public boolean isFinish() {
-        return true;
+        if (lobby != null && spawn != null && respawn != null && mobSpawn.size() > 0)
+            return true;
+        return false;
     }
 
     public void addMobSpawn(Location loc) {
         mobSpawn.add(loc);
         List<String> list = new ArrayList<>();
         for (Location location : mobSpawn) {
-            list.add(locationToString(location));
+            list.add(Utli.locationToString(location));
         }
         plugin.getRoomData().set(name + "." + "mobspawn", list);
         plugin.saveRoomData();

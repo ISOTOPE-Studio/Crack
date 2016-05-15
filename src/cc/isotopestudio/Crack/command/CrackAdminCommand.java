@@ -25,44 +25,101 @@ public class CrackAdminCommand implements CommandExecutor {
                 sender.sendMessage(S.toPrefixRed("你没有权限"));
                 return true;
             }
-            if (args.length > 1 && !args[0].equalsIgnoreCase("help")) {
-                if (args[1].equalsIgnoreCase("check")) {
-                    RoomData room = new RoomData(args[0]);
-                    if (!room.isExist()) {
-                        player.sendMessage(S.toPrefixRed("副本房间" + args[0] + "不存在"));
+            if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
+                sendHelp(player, label);
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("list")) {
+                String result = S.toPrefixAqua("列表: ");
+                for (RoomData room : RoomData.rooms.values()) {
+
+                    if (!room.isFinish())
+                        result += S.toRed(room.getName());
+                    else
+                        result += S.toBoldGreen(room.getName());
+                    result += ", ";
+                }
+                player.sendMessage(result);
+                return true;
+            }
+            if (args.length == 1) {
+                RoomData room = RoomData.rooms.get(args[0]);
+                if (room == null) {
+                    player.sendMessage(S.toPrefixRed("副本房间 " + args[0] + " 不存在"));
+                    return true;
+                }
+                player.sendMessage(S.toPrefixGreen("副本房间 " + args[0] + " 的信息"));
+                player.sendMessage(S.toAqua("    等待大厅     ") + ((room.getLobby() == null) ? S.toRed("未设置") : S.toGreen("已设置")));
+                player.sendMessage(S.toAqua("    出生点大厅  ") + ((room.getSpawn() == null) ? S.toRed("未设置") : S.toGreen("已设置")));
+                player.sendMessage(S.toAqua("    重生点       ") + ((room.getRespawn() == null) ? S.toRed("未设置") : S.toGreen("已设置")));
+                player.sendMessage(S.toAqua("    怪物刷出点  ") +
+                        ((room.getMobSpawn().size() == 0) ? S.toRed("未设置") : S.toGreen("已设置" + room.getMobSpawn().size() + "个")));
+                return true;
+            }
+            if (args.length > 1) {
+                if (args[1].equalsIgnoreCase("create")) {
+                    if (args[2].equalsIgnoreCase("list")) {
+                        player.sendMessage(S.toPrefixRed("请换个名字" +
+                                ""));
                         return true;
                     }
-                    player.sendMessage(S.toPrefixGreen("副本房间 " + args[0] + " 的信息"));
-                    player.sendMessage(S.toAqua("    等待大厅     ") + ((room.getLobby() == null) ? S.toRed("未设置") : S.toGreen("已设置")));
-                    player.sendMessage(S.toAqua("    出生点大厅  ") + ((room.getSpawn() == null) ? S.toRed("未设置") : S.toGreen("已设置")));
-                    player.sendMessage(S.toAqua("    重生点       ") + ((room.getRespawn() == null) ? S.toRed("未设置") : S.toGreen("已设置")));
-                    player.sendMessage(S.toAqua("    怪物刷出点  ") +
-                            ((room.getMobSpawn().size() == 0) ? S.toRed("未设置") : S.toGreen("已设置" + room.getMobSpawn().size() + "个")));
+                    if (RoomData.rooms.get(args[0]) != null) {
+                        player.sendMessage(S.toPrefixRed("副本房间" + args[0] + "已经存在"));
+                        return true;
+                    }
+                    RoomData.rooms.put(args[0], new RoomData(args[0]));
+                    player.sendMessage(S.toPrefixGreen("成功创建副本房间 " + args[0]));
+                    player.sendMessage(S.toPrefixGreen("请继续设置大厅、出生点、重生点和怪物刷出点"));
                     return true;
                 }
                 if (args[1].equalsIgnoreCase("spawn")) {
-                    new RoomData(args[0]).setSpawn(player.getLocation());
+                    RoomData room = RoomData.rooms.get(args[0]);
+                    if (room == null) {
+                        player.sendMessage(S.toPrefixRed("副本房间 " + args[0] + " 不存在"));
+                        return true;
+                    }
+                    room.setSpawn(player.getLocation());
                     player.sendMessage(S.toPrefixGreen("成功设置 " + args[0] + " 的出生点"));
                     return true;
                 }
                 if (args[1].equalsIgnoreCase("respawn")) {
-                    new RoomData(args[0]).setRespawn(player.getLocation());
+                    RoomData room = RoomData.rooms.get(args[0]);
+                    if (room == null) {
+                        player.sendMessage(S.toPrefixRed("副本房间 " + args[0] + " 不存在"));
+                        return true;
+                    }
+                    room.setRespawn(player.getLocation());
                     player.sendMessage(S.toPrefixGreen("成功设置 " + args[0] + " 的重生点"));
                     return true;
                 }
                 if (args[1].equalsIgnoreCase("lobby")) {
-                    new RoomData(args[0]).setLobby(player.getLocation());
+                    RoomData room = RoomData.rooms.get(args[0]);
+                    if (room == null) {
+                        player.sendMessage(S.toPrefixRed("副本房间 " + args[0] + " 不存在"));
+                        return true;
+                    }
+                    room.setLobby(player.getLocation());
                     player.sendMessage(S.toPrefixGreen("成功设置 " + args[0] + " 的等待大厅"));
                     return true;
                 }
                 if (args[1].equalsIgnoreCase("mob") && args.length > 2) {
                     if (args[2].equalsIgnoreCase("add")) {
-                        new RoomData(args[0]).addMobSpawn(player.getLocation());
+                        RoomData room = RoomData.rooms.get(args[0]);
+                        if (room == null) {
+                            player.sendMessage(S.toPrefixRed("副本房间 " + args[0] + " 不存在"));
+                            return true;
+                        }
+                        room.addMobSpawn(player.getLocation());
                         player.sendMessage(S.toPrefixGreen("成功添加 " + args[0] + " 的怪物刷出点"));
                         return true;
                     }
                     if (args[2].equalsIgnoreCase("list")) {
-                        List<Location> locations = new RoomData(args[0]).getMobSpawn();
+                        RoomData room = RoomData.rooms.get(args[0]);
+                        if (room == null) {
+                            player.sendMessage(S.toPrefixRed("副本房间 " + args[0] + " 不存在"));
+                            return true;
+                        }
+                        List<Location> locations = room.getMobSpawn();
                         player.sendMessage(S.toPrefixGreen(args[0] + "的怪物刷出点列表"));
                         for (int i = 0; i < locations.size(); i++) {
                             player.sendMessage(S.toGray(" [" + i + "]") +
@@ -78,7 +135,12 @@ public class CrackAdminCommand implements CommandExecutor {
                             player.sendMessage(S.toPrefixRed(args[3] + "不是数字"));
                             return true;
                         }
-                        Location location = new RoomData(args[0]).deleteMobSpawn(index);
+                        RoomData room = RoomData.rooms.get(args[0]);
+                        if (room == null) {
+                            player.sendMessage(S.toPrefixRed("副本房间 " + args[0] + " 不存在"));
+                            return true;
+                        }
+                        Location location = room.deleteMobSpawn(index);
                         if (location == null) {
                             player.sendMessage(S.toPrefixRed(args[3] + "不是有效数字"));
                         } else
@@ -86,10 +148,10 @@ public class CrackAdminCommand implements CommandExecutor {
                         return true;
                     }
                 }
-                sendHelp(player, label);
+                player.sendMessage(S.toPrefixRed("未知命令"));
                 return true;
             } else {
-                sendHelp(player, label);
+                player.sendMessage(S.toPrefixRed("未知命令"));
                 return true;
             }
         }
@@ -98,7 +160,9 @@ public class CrackAdminCommand implements CommandExecutor {
 
     private void sendHelp(CommandSender player, String label) {
         player.sendMessage(S.toPrefixGreen("帮助菜单"));
+        player.sendMessage(S.toBoldGreen("/" + label + " list") + S.toGray(" - ") + S.toGold("创建新的副本房间"));
         player.sendMessage(S.toBoldGreen("/" + label + " <房间名>") + S.toGray(" - ") + S.toGold("查看副本房间信息"));
+        player.sendMessage(S.toBoldGreen("/" + label + " <房间名> create") + S.toGray(" - ") + S.toGold("创建新的副本房间"));
         player.sendMessage(S.toBoldGreen("/" + label + " <房间名> spawn") + S.toGray(" - ") + S.toGold("设置副本房间出生点"));
         player.sendMessage(S.toBoldGreen("/" + label + " <房间名> respawn") + S.toGray(" - ") + S.toGold("设置副本房间重生点"));
         player.sendMessage(S.toBoldGreen("/" + label + " <房间名> lobby") + S.toGray(" - ") + S.toGold("设置副本房间大厅"));

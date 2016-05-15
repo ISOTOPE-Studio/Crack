@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import cc.isotopestudio.Crack.command.CrackCommand;
+import cc.isotopestudio.Crack.data.RoomData;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -31,6 +32,7 @@ public class Crack extends JavaPlugin {
 		createFile("config");
 		try {
 			getRoomData().save(roomDataFile);
+            getPlayerData().save(playerDataFile);
 		} catch (IOException e) {
 			getLogger().info("副本文件出错！");
 			getServer().getPluginManager().disablePlugin(this);
@@ -38,6 +40,7 @@ public class Crack extends JavaPlugin {
 		}
 		this.getCommand("CrackAdmin").setExecutor(new CrackAdminCommand());
 		this.getCommand("Crack").setExecutor(new CrackCommand());
+        RoomData.update();
 		getLogger().info(pluginName + "成功加载!");
 		getLogger().info(pluginName + "由ISOTOPE Studio制作!");
 		getLogger().info("http://isotopestudio.cc");
@@ -77,6 +80,34 @@ public class Crack extends JavaPlugin {
 		}
 		try {
 			getRoomData().save(roomDataFile);
+		} catch (IOException ex) {
+			getLogger().info("副本文件保存失败！");
+		}
+	}
+	
+	private File playerDataFile = null;
+	private FileConfiguration playerData = null;
+
+	public void reloadPlayerData() {
+		if (playerDataFile == null) {
+			playerDataFile = new File(getDataFolder(), "players.yml");
+		}
+		playerData = YamlConfiguration.loadConfiguration(playerDataFile);
+	}
+
+	public FileConfiguration getPlayerData() {
+		if (playerData == null) {
+			reloadPlayerData();
+		}
+		return playerData;
+	}
+
+	public void savePlayerData() {
+		if (playerData == null || playerDataFile == null) {
+			return;
+		}
+		try {
+			getPlayerData().save(playerDataFile);
 		} catch (IOException ex) {
 			getLogger().info("副本文件保存失败！");
 		}
