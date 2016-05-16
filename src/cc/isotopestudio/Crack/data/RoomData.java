@@ -1,5 +1,6 @@
 package cc.isotopestudio.Crack.data;
 
+import cc.isotopestudio.Crack.type.RoomStatus;
 import cc.isotopestudio.Crack.utli.Utli;
 import org.bukkit.Location;
 
@@ -15,6 +16,7 @@ public class RoomData {
     private Location spawn;
     private Location respawn;
     private List<Location> mobSpawn;
+    private RoomStatus status;
 
     public static HashMap<String, RoomData> rooms;
 
@@ -28,10 +30,10 @@ public class RoomData {
     public RoomData(String name) {
         this.name = name;
         mobSpawn = new ArrayList<>();
-        insertLocation();
+        insertInfo();
     }
 
-    private void insertLocation() {
+    private void insertInfo() {
         lobby = getLocation("lobby");
         spawn = getLocation("spawn");
         respawn = getLocation("respawn");
@@ -39,6 +41,7 @@ public class RoomData {
         for (String line : plugin.getRoomData().getStringList(name + ".mobspawn")) {
             mobSpawn.add(Utli.stringToLocation(line));
         }
+        status = RoomStatus.valueOf(plugin.getRoomData().getString(name + ".status", RoomStatus.OPEN.name()));
     }
 
     private Location getLocation(String key) {
@@ -81,26 +84,24 @@ public class RoomData {
         storeLocation("respawn", loc);
     }
 
-    public boolean isExist() {
-        if (lobby == null && spawn == null && respawn == null && mobSpawn.size() == 0)
-            return false;
-        return true;
-    }
-
     public boolean isFinish() {
         if (lobby != null && spawn != null && respawn != null && mobSpawn.size() > 0)
             return true;
         return false;
     }
 
-    public void addMobSpawn(Location loc) {
-        mobSpawn.add(loc);
+    private void saveMobSpawn() {
         List<String> list = new ArrayList<>();
         for (Location location : mobSpawn) {
             list.add(Utli.locationToString(location));
         }
         plugin.getRoomData().set(name + "." + "mobspawn", list);
         plugin.saveRoomData();
+    }
+
+    public void addMobSpawn(Location loc) {
+        mobSpawn.add(loc);
+        saveMobSpawn();
     }
 
     public List<Location> getMobSpawn() {
@@ -110,6 +111,21 @@ public class RoomData {
     public Location deleteMobSpawn(int index) {
         if (index < 0 || index >= this.mobSpawn.size())
             return null;
+        saveMobSpawn();
         return this.mobSpawn.remove(index);
     }
+
+    public RoomStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(RoomStatus status) {
+        this.status = status;
+    }
+
+    public int getPlayerNum() {
+        List<String> players = plugin.getRoomData().getStringList(this.getName()+"players");
+        return players.size();
+    }
+
 }

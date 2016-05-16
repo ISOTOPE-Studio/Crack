@@ -72,53 +72,33 @@ public class CrackAdminCommand implements CommandExecutor {
                     player.sendMessage(S.toPrefixGreen("请继续设置大厅、出生点、重生点和怪物刷出点"));
                     return true;
                 }
+                RoomData room = RoomData.rooms.get(args[0]);
+                if (room == null) {
+                    player.sendMessage(S.toPrefixRed("副本房间 " + args[0] + " 不存在"));
+                    return true;
+                }
                 if (args[1].equalsIgnoreCase("spawn")) {
-                    RoomData room = RoomData.rooms.get(args[0]);
-                    if (room == null) {
-                        player.sendMessage(S.toPrefixRed("副本房间 " + args[0] + " 不存在"));
-                        return true;
-                    }
                     room.setSpawn(player.getLocation());
                     player.sendMessage(S.toPrefixGreen("成功设置 " + args[0] + " 的出生点"));
                     return true;
                 }
                 if (args[1].equalsIgnoreCase("respawn")) {
-                    RoomData room = RoomData.rooms.get(args[0]);
-                    if (room == null) {
-                        player.sendMessage(S.toPrefixRed("副本房间 " + args[0] + " 不存在"));
-                        return true;
-                    }
                     room.setRespawn(player.getLocation());
                     player.sendMessage(S.toPrefixGreen("成功设置 " + args[0] + " 的重生点"));
                     return true;
                 }
                 if (args[1].equalsIgnoreCase("lobby")) {
-                    RoomData room = RoomData.rooms.get(args[0]);
-                    if (room == null) {
-                        player.sendMessage(S.toPrefixRed("副本房间 " + args[0] + " 不存在"));
-                        return true;
-                    }
                     room.setLobby(player.getLocation());
                     player.sendMessage(S.toPrefixGreen("成功设置 " + args[0] + " 的等待大厅"));
                     return true;
                 }
                 if (args[1].equalsIgnoreCase("mob") && args.length > 2) {
                     if (args[2].equalsIgnoreCase("add")) {
-                        RoomData room = RoomData.rooms.get(args[0]);
-                        if (room == null) {
-                            player.sendMessage(S.toPrefixRed("副本房间 " + args[0] + " 不存在"));
-                            return true;
-                        }
                         room.addMobSpawn(player.getLocation());
                         player.sendMessage(S.toPrefixGreen("成功添加 " + args[0] + " 的怪物刷出点"));
                         return true;
                     }
                     if (args[2].equalsIgnoreCase("list")) {
-                        RoomData room = RoomData.rooms.get(args[0]);
-                        if (room == null) {
-                            player.sendMessage(S.toPrefixRed("副本房间 " + args[0] + " 不存在"));
-                            return true;
-                        }
                         List<Location> locations = room.getMobSpawn();
                         player.sendMessage(S.toPrefixGreen(args[0] + "的怪物刷出点列表"));
                         for (int i = 0; i < locations.size(); i++) {
@@ -130,18 +110,12 @@ public class CrackAdminCommand implements CommandExecutor {
                     if (args[2].equalsIgnoreCase("delete") && args.length > 3) {
                         int index = 0;
                         try {
-                            Integer.parseInt(args[3]);
+                            index = Integer.parseInt(args[3]);
                         } catch (Exception e) {
                             player.sendMessage(S.toPrefixRed(args[3] + "不是数字"));
                             return true;
                         }
-                        RoomData room = RoomData.rooms.get(args[0]);
-                        if (room == null) {
-                            player.sendMessage(S.toPrefixRed("副本房间 " + args[0] + " 不存在"));
-                            return true;
-                        }
-                        Location location = room.deleteMobSpawn(index);
-                        if (location == null) {
+                        if (room.deleteMobSpawn(index) == null) {
                             player.sendMessage(S.toPrefixRed(args[3] + "不是有效数字"));
                         } else
                             player.sendMessage(S.toPrefixGreen("成功删除 " + args[0] + " 的怪物刷出点"));

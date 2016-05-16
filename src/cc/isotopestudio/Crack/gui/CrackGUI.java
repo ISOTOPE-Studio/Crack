@@ -20,17 +20,27 @@ public class CrackGUI extends GUI {
             if (!room.isFinish()) {
                 continue;
             }
-            setOption(count, new ItemStack(Material.DIAMOND_SWORD), S.toAqua(room.getName()), S.toGreen("点击加入"));
+            setOption(count, new ItemStack(Material.DIAMOND_SWORD), S.toAqua(room.getName()),
+                    S.toYellow(room.getPlayerNum() + "个玩家"), S.toGreen("点击加入"));
             count++;
         }
     }
 
     @Override
     @EventHandler
-    public void onInventoryClick(InventoryClickEvent event) {
+    public void onInventoryClick(final InventoryClickEvent event) {
         if (event.getInventory().getName().equals(name)) {
             event.setCancelled(true);
+            int slot = event.getRawSlot();
+            if (slot < 0 || slot >= size) {
+                return;
+            }
+            if (optionIcons[slot] == null) {
+                return;
+            }
             Player player = (Player) event.getWhoClicked();
+            OptionClickEvent e = new OptionClickEvent(player, slot, optionNames[slot]);
+
             LocationType type = PlayerData.getLocation(player);
             if (type == LocationType.NONE) {
                 PlayerData.teleport(player,
@@ -39,6 +49,9 @@ public class CrackGUI extends GUI {
                 player.sendMessage(S.toPrefixGreen("传送到游戏大厅"));
             } else {
                 player.sendMessage(S.toPrefixGreen("你在游戏中"));
+            }
+            if (e.willClose()) {
+                player.closeInventory();
             }
         }
     }

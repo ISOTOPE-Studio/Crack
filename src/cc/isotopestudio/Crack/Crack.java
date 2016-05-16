@@ -18,18 +18,14 @@ public class Crack extends JavaPlugin {
 	private static final String pluginName = "Crack";
 	public static Crack plugin;
 
-	private void createFile(String name) {
-		File file;
-		file = new File(getDataFolder(), name + ".yml");
+	@Override
+	public void onEnable() {
+		getLogger().info("╪стьнд╪Ч...");
+        plugin = this;File file;
+		file = new File(getDataFolder(), "config.yml");
 		if (!file.exists()) {
 			saveDefaultConfig();
 		}
-	}
-
-	@Override
-	public void onEnable() {
-        plugin = this;
-		createFile("config");
 		try {
 			getRoomData().save(roomDataFile);
             getPlayerData().save(playerDataFile);

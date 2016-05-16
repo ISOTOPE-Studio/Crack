@@ -4,6 +4,8 @@ import cc.isotopestudio.Crack.type.LocationType;
 import cc.isotopestudio.Crack.utli.Utli;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 import static cc.isotopestudio.Crack.Crack.plugin;
 import static cc.isotopestudio.Crack.type.LocationType.NONE;
 
@@ -26,6 +28,9 @@ public class PlayerData {
                 plugin.getPlayerData().set(player.getName() + ".location", Utli.locationToString(player.getLocation()));
                 plugin.getPlayerData().set(player.getName() + ".type", type.name());
                 plugin.getPlayerData().set(player.getName() + ".room", room.getName());
+                List<String> players = plugin.getRoomData().getStringList(room.getName() + "players");
+                players.add(player.getName());
+                plugin.getRoomData().set(room.getName() + ".players", players);
                 player.teleport(room.getLobby());
                 break;
             }
@@ -37,10 +42,14 @@ public class PlayerData {
             case NONE: {
                 player.teleport(Utli.stringToLocation(plugin.getPlayerData().getString(player.getName() + ".location")));
                 plugin.getPlayerData().set(player.getName(), null);
+                List<String> players = plugin.getRoomData().getStringList(room.getName() + "players");
+                players.remove(player.getName());
+                plugin.getRoomData().set(room.getName() + "players", players);
                 break;
             }
         }
         plugin.savePlayerData();
+        plugin.saveRoomData();
         return true;
     }
 }
