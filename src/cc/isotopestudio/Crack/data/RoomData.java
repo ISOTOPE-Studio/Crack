@@ -41,7 +41,7 @@ public class RoomData {
         for (String line : plugin.getRoomData().getStringList(name + ".mobspawn")) {
             mobSpawn.add(Utli.stringToLocation(line));
         }
-        status = RoomStatus.valueOf(plugin.getRoomData().getString(name + ".status", RoomStatus.OPEN.name()));
+        status = RoomStatus.valueOf(plugin.getRoomData().getString(name + ".status", RoomStatus.WAITING.name()));
     }
 
     private Location getLocation(String key) {
@@ -124,8 +124,15 @@ public class RoomData {
     }
 
     public int getPlayerNum() {
-        List<String> players = plugin.getRoomData().getStringList(this.getName()+"players");
-        return players.size();
+        return plugin.getRoomData().getStringList(this.getName() + "players").size();
+    }
+
+    public List<String> getPlayersNames() {
+        return plugin.getRoomData().getStringList(this.getName() + "players");
+    }
+
+    public boolean start() {
+        return true;
     }
 
 }

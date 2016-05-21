@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import cc.isotopestudio.Crack.command.CrackCommand;
 import cc.isotopestudio.Crack.data.RoomData;
+import cc.isotopestudio.Crack.listener.ListenerManager;
+import cc.isotopestudio.Crack.task.TaskManager;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -34,7 +36,9 @@ public class Crack extends JavaPlugin {
 			getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
-		this.getCommand("CrackAdmin").setExecutor(new CrackAdminCommand());
+        ListenerManager.enable();
+        TaskManager.enable();
+        this.getCommand("CrackAdmin").setExecutor(new CrackAdminCommand());
 		this.getCommand("Crack").setExecutor(new CrackCommand());
         RoomData.update();
 		getLogger().info(pluginName + "≥…π¶º”‘ÿ!");

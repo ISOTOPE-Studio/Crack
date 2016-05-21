@@ -15,10 +15,10 @@ import static cc.isotopestudio.Crack.type.LocationType.NONE;
  */
 public class PlayerData {
 
-    public static LocationType getLocation(Player player) {
-        if (plugin.getPlayerData().getString(player.getName() + ".type") == null)
+    public static LocationType getLocationType(String playerName) {
+        if (plugin.getPlayerData().getString(playerName + ".type") == null)
             return NONE;
-        return LocationType.valueOf(plugin.getPlayerData().getString(player.getName() + ".type"));
+        return LocationType.valueOf(plugin.getPlayerData().getString(playerName + ".type"));
     }
 
     public static boolean teleport(Player player, RoomData room, LocationType type) {
@@ -51,5 +51,10 @@ public class PlayerData {
         plugin.savePlayerData();
         plugin.saveRoomData();
         return true;
+    }
+
+    public static RoomData getRoom(String playerName) {
+        if (getLocationType(playerName) == NONE) return null;
+        return RoomData.rooms.get(plugin.getPlayerData().getString(playerName + ".room"));
     }
 }

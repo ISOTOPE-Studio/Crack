@@ -41,7 +41,7 @@ public class CrackGUI extends GUI {
             Player player = (Player) event.getWhoClicked();
             OptionClickEvent e = new OptionClickEvent(player, slot, optionNames[slot]);
 
-            LocationType type = PlayerData.getLocation(player);
+            LocationType type = PlayerData.getLocationType(player);
             if (type == LocationType.NONE) {
                 PlayerData.teleport(player,
                         RoomData.rooms.get(ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName())),

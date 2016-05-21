@@ -6,7 +6,6 @@ package cc.isotopestudio.Crack.type;
  */
 public enum RoomStatus {
 
-    OPEN,
     WAITING,
     PROGRESS;
 }
