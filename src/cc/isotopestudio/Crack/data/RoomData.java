@@ -4,9 +4,7 @@ import cc.isotopestudio.Crack.type.RoomStatus;
 import cc.isotopestudio.Crack.utli.Utli;
 import org.bukkit.Location;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static cc.isotopestudio.Crack.Crack.plugin;
 
@@ -17,6 +15,10 @@ public class RoomData {
     private Location respawn;
     private List<Location> mobSpawn;
     private RoomStatus status;
+    private int minPlayer;
+    private int maxPlayer;
+    private Set<String> players;
+    private long scheduleStart = -1;
 
     public static HashMap<String, RoomData> rooms;
 
@@ -30,6 +32,7 @@ public class RoomData {
     public RoomData(String name) {
         this.name = name;
         mobSpawn = new ArrayList<>();
+        players = new HashSet<>();
         insertInfo();
     }
 
@@ -41,7 +44,11 @@ public class RoomData {
         for (String line : plugin.getRoomData().getStringList(name + ".mobspawn")) {
             mobSpawn.add(Utli.stringToLocation(line));
         }
+        minPlayer = plugin.getRoomData().getInt(name + ".min");
+        maxPlayer = plugin.getRoomData().getInt(name + ".max");
         status = RoomStatus.valueOf(plugin.getRoomData().getString(name + ".status", RoomStatus.WAITING.name()));
+        plugin.getRoomData().set(name + ".players", null);
+        plugin.saveRoomData();
     }
 
     private Location getLocation(String key) {
@@ -95,7 +102,7 @@ public class RoomData {
         for (Location location : mobSpawn) {
             list.add(Utli.locationToString(location));
         }
-        plugin.getRoomData().set(name + "." + "mobspawn", list);
+        plugin.getRoomData().set(name + ".mobspawn", list);
         plugin.saveRoomData();
     }
 
@@ -115,20 +122,72 @@ public class RoomData {
         return this.mobSpawn.remove(index);
     }
 
+    public void clearMobSpawn() {
+        mobSpawn.clear();
+        saveMobSpawn();
+    }
+
+    public int getMinPlayer() {
+        return minPlayer;
+    }
+
+    public void setMinPlayer(int minPlayer) {
+        this.minPlayer = minPlayer;
+        plugin.getRoomData().set(name + ".min", minPlayer);
+        plugin.saveRoomData();
+    }
+
+    public int getMaxPlayer() {
+        return maxPlayer;
+    }
+
+    public void setMaxPlayer(int maxPlayer) {
+        this.maxPlayer = maxPlayer;
+        plugin.getRoomData().set(name + ".max", maxPlayer);
+        plugin.saveRoomData();
+    }
+
+    public void addPlayer(String playerName) {
+        players.add(playerName);
+        savePlayers();
+    }
+
+    public boolean removePlayer(String playerName) {
+        if (players.remove(playerName)) {
+            savePlayers();
+            return true;
+        }
+        return false;
+    }
+
+    public int getPlayerNum() {
+        return players.size();
+    }
+
+    public Set<String> getPlayersNames() {
+        return players;
+    }
+
+    public void clearPlayers() {
+        players.clear();
+        savePlayers();
+    }
+
+    private void savePlayers() {
+        List<String> list = new ArrayList<>();
+        for (String player : players) {
+            list.add(player);
+        }
+        plugin.getRoomData().set(this.getName() + ".players", list);
+        plugin.saveRoomData();
+    }
+
     public RoomStatus getStatus() {
         return status;
     }
 
     public void setStatus(RoomStatus status) {
         this.status = status;
-    }
-
-    public int getPlayerNum() {
-        return plugin.getRoomData().getStringList(this.getName() + "players").size();
-    }
-
-    public List<String> getPlayersNames() {
-        return plugin.getRoomData().getStringList(this.getName() + "players");
     }
 
     public boolean start() {

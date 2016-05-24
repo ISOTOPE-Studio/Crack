@@ -11,19 +11,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class CrackGUI extends GUI {
-    public CrackGUI() {
-        super(getName(S.toAqua("副本房间")), 9 * 6);
-        int count = 0;
-        for (RoomData room : RoomData.rooms.values()) {
-            if (count > 9 * 6) break;
-            if (!room.isFinish()) {
-                continue;
-            }
-            setOption(count, new ItemStack(Material.DIAMOND_SWORD), S.toAqua(room.getName()),
-                    S.toYellow(room.getPlayerNum() + "个玩家"), S.toGreen("点击加入"), S.toYellow(room.getPlayersNames().toString()));
-            count++;
-        }
+public class GameGUI extends GUI {
+    public GameGUI(RoomData room) {
+        super(getName(S.toAqua("副本房间")), 9);
+        setOption(0, new ItemStack(Material.DIAMOND_SWORD), S.toAqua(room.getName()),
+                S.toYellow(room.getPlayerNum() + "个玩家"), S.toGreen("点击退出"));
     }
 
     @Override

@@ -7,17 +7,18 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 
 import java.util.List;
 
-public class CrackAdminCommand implements CommandExecutor {
+public class CrackAdminCommand implements CommandExecutor, Listener {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("crackadmin")) {
             if (!(sender instanceof Player)) {
                 sender.sendMessage(S.toPrefixRed("必须要玩家才能执行"));
-                sendHelp(sender, label);
+                sendHelpPage1(sender, label);
                 return true;
             }
             Player player = (Player) sender;
@@ -26,7 +27,11 @@ public class CrackAdminCommand implements CommandExecutor {
                 return true;
             }
             if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
-                sendHelp(player, label);
+                if (args.length > 1 && args[1].equalsIgnoreCase("2")) {
+                    sendHelpPage2(player, label);
+                    return true;
+                }
+                sendHelpPage1(player, label);
                 return true;
             }
             if (args[0].equalsIgnoreCase("list")) {
@@ -58,16 +63,18 @@ public class CrackAdminCommand implements CommandExecutor {
             }
             if (args.length > 1) {
                 if (args[1].equalsIgnoreCase("create")) {
-                    if (args[2].equalsIgnoreCase("list")) {
-                        player.sendMessage(S.toPrefixRed("请换个名字" +
-                                ""));
+                    if (args[0].equalsIgnoreCase("list")) {
+                        player.sendMessage(S.toPrefixRed("请换个名字" + ""));
                         return true;
                     }
                     if (RoomData.rooms.get(args[0]) != null) {
                         player.sendMessage(S.toPrefixRed("副本房间" + args[0] + "已经存在"));
                         return true;
                     }
-                    RoomData.rooms.put(args[0], new RoomData(args[0]));
+                    RoomData room = new RoomData(args[0]);
+                    RoomData.rooms.put(args[0], room);
+                    room.setMaxPlayer(10);
+                    room.setMinPlayer(2);
                     player.sendMessage(S.toPrefixGreen("成功创建副本房间 " + args[0]));
                     player.sendMessage(S.toPrefixGreen("请继续设置大厅、出生点、重生点和怪物刷出点"));
                     return true;
@@ -121,6 +128,43 @@ public class CrackAdminCommand implements CommandExecutor {
                             player.sendMessage(S.toPrefixGreen("成功删除 " + args[0] + " 的怪物刷出点"));
                         return true;
                     }
+                    if (args[2].equalsIgnoreCase("clear")) {
+                        room.clearMobSpawn();
+                        player.sendMessage(S.toPrefixGreen("成功清空 " + args[0] + " 的怪物刷出点"));
+                        return true;
+                    }
+                }
+                if (args[1].equalsIgnoreCase("min")) {
+                    int min = 0;
+                    try {
+                        min = Integer.parseInt(args[2]);
+                    } catch (Exception e) {
+                        player.sendMessage(S.toPrefixRed(args[2] + "不是数字"));
+                        return true;
+                    }
+                    if (min > room.getMaxPlayer()) {
+                        player.sendMessage(S.toPrefixRed("不能超过最大玩家数量" + room.getMaxPlayer()));
+                        return true;
+                    }
+                    room.setMinPlayer(min);
+                    player.sendMessage(S.toPrefixGreen("成功设置 " + args[0] + " 的最小玩家数量"));
+                    return true;
+                }
+                if (args[1].equalsIgnoreCase("max")) {
+                    int max = 0;
+                    try {
+                        max = Integer.parseInt(args[2]);
+                    } catch (Exception e) {
+                        player.sendMessage(S.toPrefixRed(args[2] + "不是数字"));
+                        return true;
+                    }
+                    if (max < room.getMinPlayer()) {
+                        player.sendMessage(S.toPrefixRed("不能小于最小玩家数量" + room.getMinPlayer()));
+                        return true;
+                    }
+                    room.setMaxPlayer(max);
+                    player.sendMessage(S.toPrefixGreen("成功设置 " + args[0] + " 的最大玩家数量"));
+                    return true;
                 }
                 player.sendMessage(S.toPrefixRed("未知命令"));
                 return true;
@@ -132,8 +176,8 @@ public class CrackAdminCommand implements CommandExecutor {
         return false;
     }
 
-    private void sendHelp(CommandSender player, String label) {
-        player.sendMessage(S.toPrefixGreen("帮助菜单"));
+    private void sendHelpPage1(CommandSender player, String label) {
+        player.sendMessage(S.toPrefixGreen("帮助菜单 第 1 页"));
         player.sendMessage(S.toBoldGreen("/" + label + " list") + S.toGray(" - ") + S.toGold("创建新的副本房间"));
         player.sendMessage(S.toBoldGreen("/" + label + " <房间名>") + S.toGray(" - ") + S.toGold("查看副本房间信息"));
         player.sendMessage(S.toBoldGreen("/" + label + " <房间名> create") + S.toGray(" - ") + S.toGold("创建新的副本房间"));
@@ -143,6 +187,15 @@ public class CrackAdminCommand implements CommandExecutor {
         player.sendMessage(S.toBoldGreen("/" + label + " <房间名> mob add") + S.toGray(" - ") + S.toGold("添加副本房间怪物刷出点"));
         player.sendMessage(S.toBoldGreen("/" + label + " <房间名> mob list") + S.toGray(" - ") + S.toGold("查看副本房间怪物刷出点列表"));
         player.sendMessage(S.toBoldGreen("/" + label + " <房间名> mob delete <编号>") + S.toGray(" - ") + S.toGold("查看副本房间怪物刷出点列表"));
+        player.sendMessage(S.toBoldGreen("/" + label + " <房间名> mob clear") + S.toGray(" - ") + S.toGold("清除副本房间怪物刷出点列表"));
+        player.sendMessage(S.toYellow("/" + label + " help 2") + S.toGray(" - ") + S.toGold("第二页"));
+
+    }
+
+    private void sendHelpPage2(CommandSender player, String label) {
+        player.sendMessage(S.toPrefixGreen("帮助菜单 第 2 页"));
+        player.sendMessage(S.toBoldGreen("/" + label + " min <玩家数量>") + S.toGray(" - ") + S.toGold("副本房间设置副本房间最小玩家数量"));
+        player.sendMessage(S.toBoldGreen("/" + label + " max <玩家数量>") + S.toGray(" - ") + S.toGold("副本房间设置副本房间最大玩家数量"));
     }
 
 }

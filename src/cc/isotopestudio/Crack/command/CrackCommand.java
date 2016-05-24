@@ -1,6 +1,9 @@
 package cc.isotopestudio.Crack.command;
 
+import cc.isotopestudio.Crack.data.PlayerData;
+import cc.isotopestudio.Crack.data.RoomData;
 import cc.isotopestudio.Crack.gui.CrackGUI;
+import cc.isotopestudio.Crack.gui.GameGUI;
 import cc.isotopestudio.Crack.utli.S;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -21,7 +24,11 @@ public class CrackCommand implements CommandExecutor {
                 sender.sendMessage(S.toPrefixRed("你没有权限"));
                 return true;
             }
-            new CrackGUI().open(player);
+            RoomData room = PlayerData.getRoom(player.getName());
+            if (room == null)
+                new CrackGUI().open(player);
+            else
+                new GameGUI(room).open(player);
             return true;
         }
         return false;

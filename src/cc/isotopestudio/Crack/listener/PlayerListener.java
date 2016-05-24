@@ -15,6 +15,7 @@ class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         String name = event.getPlayer().getName();
+        PlayerData.resetPlayer(name);
         if (PlayerData.getRoom(name) != null) {
             switch (PlayerData.getLocationType(name)) {
                 case LOBBY: {
@@ -34,6 +35,7 @@ class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         String name = event.getPlayer().getName();
+        PlayerData.resetPlayer(name);
         if (PlayerData.getRoom(name) != null) {
             switch (PlayerData.getLocationType(name)) {
                 case LOBBY: {
@@ -49,4 +51,5 @@ class PlayerListener implements Listener {
             }
         }
     }
+    
 }
