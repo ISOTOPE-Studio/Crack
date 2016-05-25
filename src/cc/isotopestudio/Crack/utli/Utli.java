@@ -24,4 +24,8 @@ public class Utli {
         int z = Integer.parseInt(s[3]);
         return new Location(world, x, y, z);
     }
+
+    public static int getRandom(int min, int max) {
+        return (int) (Math.random() * (max - min) + min + 1);
+    }
 }

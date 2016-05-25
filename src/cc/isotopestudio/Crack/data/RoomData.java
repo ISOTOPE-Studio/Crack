@@ -1,8 +1,13 @@
 package cc.isotopestudio.Crack.data;
 
+import cc.isotopestudio.Crack.type.LocationType;
+import cc.isotopestudio.Crack.type.PlayerStatus;
 import cc.isotopestudio.Crack.type.RoomStatus;
 import cc.isotopestudio.Crack.utli.Utli;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 import java.util.*;
 
@@ -18,7 +23,10 @@ public class RoomData {
     private int minPlayer;
     private int maxPlayer;
     private Set<String> players;
+    private HashMap<String, PlayerStatus> playersStatus;
     private long scheduleStart = -1;
+
+    public Set<LivingEntity> mobs;
 
     public static HashMap<String, RoomData> rooms;
 
@@ -33,6 +41,7 @@ public class RoomData {
         this.name = name;
         mobSpawn = new ArrayList<>();
         players = new HashSet<>();
+        playersStatus = new HashMap<>();
         insertInfo();
     }
 
@@ -147,11 +156,13 @@ public class RoomData {
 
     public void addPlayer(String playerName) {
         players.add(playerName);
+        playersStatus.put(playerName, PlayerStatus.GAME);
         savePlayers();
     }
 
     public boolean removePlayer(String playerName) {
         if (players.remove(playerName)) {
+            playersStatus.remove(playerName);
             savePlayers();
             return true;
         }
@@ -168,6 +179,7 @@ public class RoomData {
 
     public void clearPlayers() {
         players.clear();
+        playersStatus.clear();
         savePlayers();
     }
 
@@ -188,10 +200,25 @@ public class RoomData {
         this.status = status;
     }
 
-    public boolean start() {
+    public void start() {
+        mobs = new HashSet<>();
         setScheduleStart(-1);
         setStatus(RoomStatus.PROGRESS);
-        return true;
+        for (String playerName : getPlayersNames()) {
+            Player player = Bukkit.getPlayer(playerName);
+            if (player == null) continue;
+            PlayerData.teleport(player, this, LocationType.GAME);
+        }
+    }
+
+    public void end() {
+        for (String playerName : players) {
+            Player player = Bukkit.getPlayer(playerName);
+            if (player == null) return;
+            PlayerData.teleport(player, this, LocationType.NONE);
+        }
+        clearPlayers();
+        setStatus(RoomStatus.WAITING);
     }
 
     public long getScheduleStart() {
@@ -200,5 +227,20 @@ public class RoomData {
 
     public void setScheduleStart(long scheduleStart) {
         this.scheduleStart = scheduleStart;
+    }
+
+    public int getAlivePlayersNum() {
+        int count = 0;
+        for (PlayerStatus status : playersStatus.values()) {
+            if (status == PlayerStatus.GAME)
+                count++;
+        }
+        return count;
+    }
+
+    public void setPlayerStatus(String playerName, PlayerStatus status) {
+        if (players.contains(playerName)) {
+            playersStatus.put(playerName, status);
+        }
     }
 }

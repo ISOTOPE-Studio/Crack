@@ -54,11 +54,18 @@ public class CrackAdminCommand implements CommandExecutor, Listener {
                     return true;
                 }
                 player.sendMessage(S.toPrefixGreen("副本房间 " + args[0] + " 的信息"));
-                player.sendMessage(S.toAqua("    等待大厅     ") + ((room.getLobby() == null) ? S.toRed("未设置") : S.toGreen("已设置")));
-                player.sendMessage(S.toAqua("    出生点大厅  ") + ((room.getSpawn() == null) ? S.toRed("未设置") : S.toGreen("已设置")));
-                player.sendMessage(S.toAqua("    重生点       ") + ((room.getRespawn() == null) ? S.toRed("未设置") : S.toGreen("已设置")));
-                player.sendMessage(S.toAqua("    怪物刷出点  ") +
-                        ((room.getMobSpawn().size() == 0) ? S.toRed("未设置") : S.toGreen("已设置" + room.getMobSpawn().size() + "个")));
+                if (room.isFinish()) {
+                    player.sendMessage(S.toGreen("    已完成设置(怪物刷出点") + S.toGreen("已设置" + room.getMobSpawn().size() + "个)"));
+                } else {
+                    player.sendMessage(S.toAqua("    等待大厅     ") + ((room.getLobby() == null) ? S.toRed("未设置") : S.toGreen("已设置")));
+                    player.sendMessage(S.toAqua("    出生点大厅  ") + ((room.getSpawn() == null) ? S.toRed("未设置") : S.toGreen("已设置")));
+                    player.sendMessage(S.toAqua("    重生点       ") + ((room.getRespawn() == null) ? S.toRed("未设置") : S.toGreen("已设置")));
+                    player.sendMessage(S.toAqua("    怪物刷出点  ") +
+                            ((room.getMobSpawn().size() == 0) ? S.toRed("未设置") : S.toGreen("已设置" + room.getMobSpawn().size() + "个")));
+                }
+                player.sendMessage(S.toAqua("    最小/大玩家数量   ") + S.toGreen(room.getMinPlayer() + " / " + room.getMaxPlayer()));
+                player.sendMessage(S.toAqua("    玩家   ") + S.toGreen(room.getPlayersNames().toString()));
+                player.sendMessage(S.toAqua("    状态   ") + S.toGreen(room.getStatus().name()));
                 return true;
             }
             if (args.length > 1) {

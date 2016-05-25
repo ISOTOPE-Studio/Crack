@@ -26,10 +26,6 @@ public class GameGUI extends GUI {
     public void onInventoryClick(final InventoryClickEvent event) {
         if (event.getInventory().getName().equals(name)) {
             event.setCancelled(true);
-            if (room.getStatus() == RoomStatus.WAITING) {
-                ((Player) event.getWhoClicked()).closeInventory();
-                return;
-            }
             int slot = event.getRawSlot();
             if (slot < 0 || slot >= size) {
                 return;
@@ -38,16 +34,8 @@ public class GameGUI extends GUI {
                 return;
             }
             Player player = (Player) event.getWhoClicked();
-            OptionClickEvent e = new OptionClickEvent(player, slot, optionNames[slot]);
-
-            LocationType type = PlayerData.getLocationType(player.getName());
             PlayerData.teleport(player, room, LocationType.NONE);
             player.sendMessage(S.toPrefixGreen("退出竞技场"));
-            if (type == LocationType.LOBBY) {
-
-            } else if (type == LocationType.GAME) {
-                player.sendMessage(S.toPrefixGreen("你在游戏中"));
-            }
             player.closeInventory();
         }
     }

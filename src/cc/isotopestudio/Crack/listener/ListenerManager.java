@@ -15,8 +15,10 @@ public class ListenerManager {
         HandlerList.unregisterAll(plugin);
 
         PlayerListener playerListener = new PlayerListener();
+        MobListener mobListener = new MobListener();
 
         PluginManager pm = plugin.getServer().getPluginManager();
         pm.registerEvents(playerListener, plugin);
+        pm.registerEvents(mobListener, plugin);
     }
 }
