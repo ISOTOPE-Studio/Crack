@@ -1,5 +1,8 @@
 package cc.isotopestudio.Crack.task;
 
+import cc.isotopestudio.Crack.data.RoomData;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -25,5 +28,13 @@ public class TaskManager {
         MobSpawnTask mobSpawnTask = new MobSpawnTask();
         mobSpawnTask.runTaskTimer(plugin, 20, 20);
         tasks.add(mobSpawnTask);
+    }
+
+    public static void sendAllPlayers(RoomData room, String msg) {
+        for (String playerName : room.getPlayersNames()) {
+            Player player = Bukkit.getPlayer(playerName);
+            if (player == null) continue;
+            player.sendMessage(msg);
+        }
     }
 }

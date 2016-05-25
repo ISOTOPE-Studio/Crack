@@ -7,5 +7,6 @@ package cc.isotopestudio.Crack.type;
 public enum RoomStatus {
 
     WAITING,
-    PROGRESS;
+    PROGRESS,
+    BOSS;
 }

@@ -46,7 +46,7 @@ public class RoomData {
         }
         minPlayer = plugin.getRoomData().getInt(name + ".min");
         maxPlayer = plugin.getRoomData().getInt(name + ".max");
-        status = RoomStatus.valueOf(plugin.getRoomData().getString(name + ".status", RoomStatus.WAITING.name()));
+        status = RoomStatus.WAITING;
         plugin.getRoomData().set(name + ".players", null);
         plugin.saveRoomData();
     }
@@ -92,9 +92,7 @@ public class RoomData {
     }
 
     public boolean isFinish() {
-        if (lobby != null && spawn != null && respawn != null && mobSpawn.size() > 0)
-            return true;
-        return false;
+        return lobby != null && spawn != null && respawn != null && mobSpawn.size() > 0;
     }
 
     private void saveMobSpawn() {
@@ -191,7 +189,16 @@ public class RoomData {
     }
 
     public boolean start() {
+        setScheduleStart(-1);
+        setStatus(RoomStatus.PROGRESS);
         return true;
     }
 
+    public long getScheduleStart() {
+        return scheduleStart;
+    }
+
+    public void setScheduleStart(long scheduleStart) {
+        this.scheduleStart = scheduleStart;
+    }
 }
