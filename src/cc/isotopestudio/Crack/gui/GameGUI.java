@@ -3,7 +3,6 @@ package cc.isotopestudio.Crack.gui;
 import cc.isotopestudio.Crack.data.PlayerData;
 import cc.isotopestudio.Crack.data.RoomData;
 import cc.isotopestudio.Crack.type.LocationType;
-import cc.isotopestudio.Crack.type.RoomStatus;
 import cc.isotopestudio.Crack.utli.S;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

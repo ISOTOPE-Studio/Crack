@@ -6,6 +6,7 @@ import cc.isotopestudio.Crack.type.RoomStatus;
 import cc.isotopestudio.Crack.utli.Utli;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -18,12 +19,13 @@ public class RoomData {
     private Location lobby;
     private Location spawn;
     private Location respawn;
-    private List<Location> mobSpawn;
+    private final List<MobSpawnObj> mobSpawn;
+    private Location boss;
     private RoomStatus status;
     private int minPlayer;
     private int maxPlayer;
-    private Set<String> players;
-    private HashMap<String, PlayerStatus> playersStatus;
+    private final Set<String> players;
+    private final HashMap<String, PlayerStatus> playersStatus;
     private long scheduleStart = -1;
 
     public Set<LivingEntity> mobs;
@@ -49,15 +51,25 @@ public class RoomData {
         lobby = getLocation("lobby");
         spawn = getLocation("spawn");
         respawn = getLocation("respawn");
+        boss = getLocation("boss");
         mobSpawn.clear();
-        for (String line : plugin.getRoomData().getStringList(name + ".mobspawn")) {
-            mobSpawn.add(Utli.stringToLocation(line));
-        }
+        ConfigurationSection mobSpawns = plugin.getRoomData().getConfigurationSection(name + ".mobspawn");
+        if (mobSpawns != null)
+            for (String line : mobSpawns.getKeys(false)) {
+                String mobName = mobSpawns.getString(line + ".mob");
+                MobData mob = MobData.mobs.get(mobName);
+                if (mob == null)
+                    continue;
+                Location loc = Utli.stringToLocation(mobSpawns.getString(line + ".location"));
+                int freq = mobSpawns.getInt(line + ".freq");
+                mobSpawn.add(new MobSpawnObj(loc, mob, freq));
+            }
         minPlayer = plugin.getRoomData().getInt(name + ".min");
         maxPlayer = plugin.getRoomData().getInt(name + ".max");
         status = RoomStatus.WAITING;
         plugin.getRoomData().set(name + ".players", null);
         plugin.saveRoomData();
+        System.out.println(mobSpawn);
     }
 
     private Location getLocation(String key) {
@@ -100,29 +112,38 @@ public class RoomData {
         storeLocation("respawn", loc);
     }
 
-    public boolean isFinish() {
-        return lobby != null && spawn != null && respawn != null && mobSpawn.size() > 0;
+    public Location getBossLocation() {
+        return boss;
+    }
+
+    public void setBossLocation(Location boss) {
+        this.boss = boss;
+        storeLocation("boss", boss);
     }
 
     private void saveMobSpawn() {
-        List<String> list = new ArrayList<>();
-        for (Location location : mobSpawn) {
-            list.add(Utli.locationToString(location));
+        plugin.getRoomData().set(name + ".mobspawn", null);
+        int count = 0;
+        for (MobSpawnObj mobSpawnObj : mobSpawn) {
+            plugin.getRoomData().set(name + ".mobspawn." + count + ".location", Utli.locationToString(mobSpawnObj.getLocation()));
+            plugin.getRoomData().set(name + ".mobspawn." + count + ".mob", mobSpawnObj.getMob().getName());
+            plugin.getRoomData().set(name + ".mobspawn." + count + ".freq", mobSpawnObj.getFreq());
+            count++;
         }
-        plugin.getRoomData().set(name + ".mobspawn", list);
         plugin.saveRoomData();
     }
 
-    public void addMobSpawn(Location loc) {
-        mobSpawn.add(loc);
+    public void addMobSpawn(Location loc, MobData mob, int freq) {
+        MobSpawnObj mobSpawnObj = new MobSpawnObj(loc, mob, freq);
+        mobSpawn.add(mobSpawnObj);
         saveMobSpawn();
     }
 
-    public List<Location> getMobSpawn() {
+    public List<MobSpawnObj> getMobSpawnObj() {
         return mobSpawn;
     }
 
-    public Location deleteMobSpawn(int index) {
+    public MobSpawnObj deleteMobSpawn(int index) {
         if (index < 0 || index >= this.mobSpawn.size())
             return null;
         saveMobSpawn();
@@ -132,6 +153,10 @@ public class RoomData {
     public void clearMobSpawn() {
         mobSpawn.clear();
         saveMobSpawn();
+    }
+
+    public boolean isFinish() {
+        return lobby != null && spawn != null && respawn != null && boss != null && mobSpawn.size() > 0;
     }
 
     public int getMinPlayer() {

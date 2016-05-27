@@ -2,6 +2,7 @@ package cc.isotopestudio.Crack;
 
 import cc.isotopestudio.Crack.command.CrackAdminCommand;
 import cc.isotopestudio.Crack.command.CrackCommand;
+import cc.isotopestudio.Crack.data.MobData;
 import cc.isotopestudio.Crack.data.RoomData;
 import cc.isotopestudio.Crack.listener.ListenerManager;
 import cc.isotopestudio.Crack.task.TaskManager;
@@ -31,11 +32,13 @@ public class Crack extends JavaPlugin {
         try {
             getRoomData().save(roomDataFile);
             getPlayerData().save(playerDataFile);
+            getMobsData().save(mobsDataFile);
         } catch (IOException e) {
-            getLogger().info("副本文件出错！");
+            getLogger().info("文件出错！");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+        MobData.update();
         clearPlayerData();
         ListenerManager.enable();
         TaskManager.enable();
@@ -119,6 +122,24 @@ public class Crack extends JavaPlugin {
             getPlayerData().set(key, null);
         }
         savePlayerData();
+    }
+
+    private File mobsDataFile = null;
+    private FileConfiguration mobsData = null;
+
+    public void reloadMobsData() {
+        if (mobsDataFile == null) {
+            this.saveResource("mobs.yml", false);
+        }
+        mobsDataFile = new File(getDataFolder(), "mobs.yml");
+        mobsData = YamlConfiguration.loadConfiguration(mobsDataFile);
+    }
+
+    public FileConfiguration getMobsData() {
+        if (mobsData == null) {
+            reloadMobsData();
+        }
+        return mobsData;
     }
 
 }

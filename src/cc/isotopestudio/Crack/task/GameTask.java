@@ -1,12 +1,14 @@
 package cc.isotopestudio.Crack.task;
 
+import cc.isotopestudio.Crack.data.MobSpawnObj;
 import cc.isotopestudio.Crack.data.RoomData;
+import cc.isotopestudio.Crack.data.Settings;
 import cc.isotopestudio.Crack.type.RoomStatus;
 import cc.isotopestudio.Crack.utli.S;
-import cc.isotopestudio.Crack.utli.Utli;
-import org.bukkit.Location;
-import org.bukkit.entity.*;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.HashMap;
 
 import static cc.isotopestudio.Crack.task.TaskManager.sendAllPlayers;
 
@@ -16,9 +18,15 @@ import static cc.isotopestudio.Crack.task.TaskManager.sendAllPlayers;
  */
 class GameTask extends BukkitRunnable {
 
+    private HashMap<RoomData, Integer> count = new HashMap<>();
+
     @Override
     public void run() {
         for (RoomData room : RoomData.rooms.values()) {
+            if (!count.containsKey(room))
+                count.put(room, 0);
+            else
+                count.put(room, count.get(room) + 1);
             if (room.getStatus() != RoomStatus.PROGRESS)
                 continue;
             if (room.getAlivePlayersNum() == 0) {
@@ -26,32 +34,15 @@ class GameTask extends BukkitRunnable {
                 room.end();
                 return;
             }
-            for (Location loc : room.getMobSpawn()) {
-                room.mobs.add(spawnMob(loc));
+            for (MobSpawnObj mobSpawnObj : room.getMobSpawnObj()) {
+                if (count.get(room) %
+                        (mobSpawnObj.getFreq() < 0 ? Settings.mobSpawnFreq : mobSpawnObj.getFreq()) == 0)
+                    room.mobs.add(spawnMob(mobSpawnObj));
             }
         }
     }
 
-    private LivingEntity spawnMob(Location loc) {
-        switch (Utli.getRandom(0, 4)) {
-            case (0): {
-                return loc.getWorld().spawn(loc, Zombie.class);
-            }
-            case (1): {
-                return loc.getWorld().spawn(loc, Skeleton.class);
-            }
-            case (2): {
-                return loc.getWorld().spawn(loc, PigZombie.class);
-            }
-            case (3): {
-                return loc.getWorld().spawn(loc, Slime.class);
-            }
-            case (4): {
-                return loc.getWorld().spawn(loc, Creeper.class);
-            }
-            default: {
-                return loc.getWorld().spawn(loc, Sheep.class);
-            }
-        }
+    private LivingEntity spawnMob(MobSpawnObj mobSpawnObj) {
+        return (LivingEntity) mobSpawnObj.getLocation().getWorld().spawn(mobSpawnObj.getLocation(), mobSpawnObj.getMob().getType().getEntityClass());
     }
 }
