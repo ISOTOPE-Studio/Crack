@@ -51,7 +51,7 @@ class PlayerListener implements Listener {
         RoomData room = PlayerData.getRoom(player.getName());
         if (room == null) return;
         PlayerData.teleport(player, room, LocationType.RESPAWN);
-        player.sendMessage(S.toPrefixYellow("复活中... 还有 30 秒"));
+        player.sendTitle(S.toYellow("复活中..."), S.toAqua("还有 30 秒"));
         Bukkit.getScheduler().runTaskLater(plugin, new BukkitRunnable() {
             @Override
             public void run() {
@@ -60,6 +60,7 @@ class PlayerListener implements Listener {
                 }
                 if (room.getStatus() != RoomStatus.WAITING) {
                     PlayerData.teleport(player, room, LocationType.GAME);
+                    room.setPlayerStatus(player.getName(), PlayerStatus.GAME);
                     player.sendMessage(S.toPrefixYellow("传送到房间"));
                 }
             }

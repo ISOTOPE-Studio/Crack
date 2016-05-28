@@ -11,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -192,13 +193,11 @@ public class RoomData {
     public void addPlayer(String playerName) {
         players.add(playerName);
         playersStatus.put(playerName, PlayerStatus.GAME);
-        savePlayers();
     }
 
     public boolean removePlayer(String playerName) {
         if (players.remove(playerName)) {
             playersStatus.remove(playerName);
-            savePlayers();
             return true;
         }
         return false;
@@ -215,16 +214,6 @@ public class RoomData {
     public void clearPlayers() {
         players.clear();
         playersStatus.clear();
-        savePlayers();
-    }
-
-    private void savePlayers() {
-        List<String> list = new ArrayList<>();
-        for (String player : players) {
-            list.add(player);
-        }
-        plugin.getRoomData().set(this.getName() + ".players", list);
-        plugin.saveRoomData();
     }
 
     public RoomStatus getStatus() {
@@ -271,16 +260,15 @@ public class RoomData {
     }
 
     public void win() {
-        TaskManager.sendAllPlayers(this, S.toPrefixGreen("胜利！"));
+        TaskManager.sendAllPlayersTitle(this, S.toGreen("胜利！"), S.toAqua("获得奖励"));
         end();
     }
 
     public void end() {
         killAllMobs();
         for (String playerName : players) {
-            Player player = Bukkit.getPlayer(playerName);
-            if (player == null) return;
-            PlayerData.teleport(player, this, LocationType.NONE);
+            final Player player = Bukkit.getPlayer(playerName);
+            new TeleportTask(this, player).runTaskLater(plugin, 20 * 3);
         }
         clearPlayers();
         setStatus(RoomStatus.WAITING);
@@ -306,6 +294,23 @@ public class RoomData {
     public void setPlayerStatus(String playerName, PlayerStatus status) {
         if (players.contains(playerName)) {
             playersStatus.put(playerName, status);
+        }
+    }
+
+    class TeleportTask extends BukkitRunnable {
+
+        private RoomData room;
+        private Player player;
+
+        public TeleportTask(RoomData room, Player player) {
+            this.room = room;
+            this.player = player;
+        }
+
+        @Override
+        public void run() {
+            if (player == null || !player.isOnline()) return;
+            PlayerData.teleport(player, room, LocationType.NONE);
         }
     }
 }

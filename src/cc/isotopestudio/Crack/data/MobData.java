@@ -43,7 +43,7 @@ public class MobData {
         }
     }
 
-    public MobData(String name, EntityType type) {
+    private MobData(String name, EntityType type) {
         this.name = name;
         this.type = type;
     }

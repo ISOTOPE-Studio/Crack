@@ -26,8 +26,12 @@ public class TaskManager {
         tasks.add(lobbyTask);
 
         GameTask gameTask = new GameTask();
-        gameTask.runTaskTimer(plugin, 20, 20);
+        gameTask.runTaskTimer(plugin, 30, 20);
         tasks.add(gameTask);
+
+        DateTask dateTask = new DateTask();
+        dateTask.runTaskTimer(plugin, 40, 20 * 60 * 60);
+        tasks.add(dateTask);
     }
 
     public static void sendAllPlayers(RoomData room, String msg) {
@@ -35,6 +39,14 @@ public class TaskManager {
             Player player = Bukkit.getPlayer(playerName);
             if (player == null) continue;
             player.sendMessage(msg);
+        }
+    }
+
+    public static void sendAllPlayersTitle(RoomData room, String title, String subtitle) {
+        for (String playerName : room.getPlayersNames()) {
+            Player player = Bukkit.getPlayer(playerName);
+            if (player == null) continue;
+            player.sendTitle(title, subtitle);
         }
     }
 }

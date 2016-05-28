@@ -8,6 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.Date;
 
 import static cc.isotopestudio.Crack.task.TaskManager.sendAllPlayers;
+import static cc.isotopestudio.Crack.task.TaskManager.sendAllPlayersTitle;
 
 /**
  * Created by Mars on 5/21/2016.
@@ -44,7 +45,7 @@ class LobbyTask extends BukkitRunnable {
                 room.setScheduleStart(-1);
             }
             if (getRemainSec(room.getScheduleStart()) == 0) {
-                sendAllPlayers(room, S.toPrefixGreen("开始游戏!"));
+                sendAllPlayersTitle(room, S.toGreen("开始游戏!"), S.toBoldPurple("怪物来袭"));
                 room.start();
             }
             if (waitCount == 0)

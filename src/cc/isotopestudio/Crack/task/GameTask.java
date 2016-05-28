@@ -10,7 +10,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.HashMap;
 
 import static cc.isotopestudio.Crack.Crack.plugin;
-import static cc.isotopestudio.Crack.task.TaskManager.sendAllPlayers;
+import static cc.isotopestudio.Crack.task.TaskManager.sendAllPlayersTitle;
 
 /**
  * Created by Mars on 5/25/2016.
@@ -23,9 +23,6 @@ class GameTask extends BukkitRunnable {
     @Override
     public void run() {
         for (RoomData room : RoomData.rooms.values()) {
-
-            System.out.println(room.mobsKillCount + ": " + room.mobs + " / " + room.boss);
-
             if (!count.containsKey(room))
                 count.put(room, 0);
             else
@@ -33,7 +30,7 @@ class GameTask extends BukkitRunnable {
             if (room.getStatus() != RoomStatus.PROGRESS)
                 continue;
             if (room.getAlivePlayersNum() == 0) {
-                sendAllPlayers(room, S.toPrefixYellow("游戏结束 :-("));
+                sendAllPlayersTitle(room, S.toBoldRed("无人幸存"), S.toYellow("游戏结束 :-("));
                 room.end();
                 continue;
             }
@@ -41,7 +38,7 @@ class GameTask extends BukkitRunnable {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        sendAllPlayers(room, S.toPrefixRed("BOSS来临!"));
+                        sendAllPlayersTitle(room, S.toBoldRed("红色警报"), S.toRed("BOSS来临!"));
                         room.boss();
                     }
                 }.runTaskLater(plugin, 20);

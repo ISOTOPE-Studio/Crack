@@ -4,6 +4,7 @@ import cc.isotopestudio.Crack.command.CrackAdminCommand;
 import cc.isotopestudio.Crack.command.CrackCommand;
 import cc.isotopestudio.Crack.data.MobData;
 import cc.isotopestudio.Crack.data.RoomData;
+import cc.isotopestudio.Crack.data.Settings;
 import cc.isotopestudio.Crack.listener.ListenerManager;
 import cc.isotopestudio.Crack.task.TaskManager;
 import org.bukkit.ChatColor;
@@ -38,6 +39,7 @@ public class Crack extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+        Settings.update();
         MobData.update();
         clearPlayerData();
         ListenerManager.enable();
@@ -119,7 +121,8 @@ public class Crack extends JavaPlugin {
 
     private void clearPlayerData() {
         for (String key : getPlayerData().getKeys(false)) {
-            getPlayerData().set(key, null);
+            if (!key.equals("date"))
+                getPlayerData().set(key, null);
         }
         savePlayerData();
     }

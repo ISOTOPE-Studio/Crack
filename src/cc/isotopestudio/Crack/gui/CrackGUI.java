@@ -3,6 +3,7 @@ package cc.isotopestudio.Crack.gui;
 import cc.isotopestudio.Crack.data.PlayerData;
 import cc.isotopestudio.Crack.data.RoomData;
 import cc.isotopestudio.Crack.type.LocationType;
+import cc.isotopestudio.Crack.type.RoomStatus;
 import cc.isotopestudio.Crack.utli.S;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -20,8 +21,23 @@ public class CrackGUI extends GUI {
             if (!room.isFinish()) {
                 continue;
             }
-            setOption(count, new ItemStack(Material.DIAMOND_SWORD), S.toAqua(room.getName()),
-                    S.toYellow(room.getPlayerNum() + "个玩家"), S.toGreen("点击加入"), S.toYellow(room.getPlayersNames().toString()));
+            switch (room.getStatus()) {
+                case WAITING: {
+                    setOption(count, new ItemStack(Material.WOOL, 1, (short) 5), S.toAqua(room.getName()), room.getStatus().toString(),
+                            S.toYellow(room.getPlayerNum() + "个玩家"), S.toGreen("点击加入"), S.toYellow(room.getPlayersNames().toString()));
+                    break;
+                }
+                case PROGRESS: {
+                    setOption(count, new ItemStack(Material.WOOL, 1, (short) 1), S.toAqua(room.getName()), room.getStatus().toString(),
+                            S.toYellow(room.getPlayerNum() + "个玩家"), S.toGreen("点击加入"), S.toYellow(room.getPlayersNames().toString()));
+                    break;
+                }
+                case BOSS: {
+                    setOption(count, new ItemStack(Material.WOOL, 1, (short) 14), S.toAqua(room.getName()), room.getStatus().toString(),
+                            S.toYellow(room.getPlayerNum() + "个玩家"), S.toGreen("点击加入"), S.toYellow(room.getPlayersNames().toString()));
+                    break;
+                }
+            }
             count++;
         }
     }
@@ -35,20 +51,24 @@ public class CrackGUI extends GUI {
             if (slot < 0 || slot >= size) {
                 return;
             }
+            Player player = (Player) event.getWhoClicked();
             if (optionIcons[slot] == null) {
+                player.sendMessage(S.toPrefixRed("副本在游戏中"));
                 return;
             }
-            Player player = (Player) event.getWhoClicked();
+            RoomData room = RoomData.rooms.get(ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName()));
+            if (room.getStatus() != RoomStatus.WAITING) {
+
+                return;
+            }
             OptionClickEvent e = new OptionClickEvent(player, slot, optionNames[slot]);
 
             LocationType type = PlayerData.getLocationType(player.getName());
             if (type == LocationType.NONE) {
-                PlayerData.teleport(player,
-                        RoomData.rooms.get(ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName())),
+                PlayerData.teleport(player, room
+                        ,
                         LocationType.LOBBY);
                 player.sendMessage(S.toPrefixGreen("传送到游戏大厅"));
-            } else {
-                player.sendMessage(S.toPrefixGreen("你在游戏中"));
             }
             if (e.willClose()) {
                 player.closeInventory();

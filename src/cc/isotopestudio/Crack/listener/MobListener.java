@@ -5,9 +5,6 @@ import cc.isotopestudio.Crack.type.RoomStatus;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.scheduler.BukkitRunnable;
-
-import static cc.isotopestudio.Crack.Crack.plugin;
 
 /**
  * Created by Mars on 5/25/2016.
@@ -23,12 +20,7 @@ class MobListener implements Listener {
             }
             if (event.getEntity().equals(room.boss)) {
                 room.boss = null;
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        room.win();
-                    }
-                }.runTaskLater(plugin, 20);
+                room.win();
             }
             if (room.mobs.remove(event.getEntity())) {
                 room.mobsKillCount++;

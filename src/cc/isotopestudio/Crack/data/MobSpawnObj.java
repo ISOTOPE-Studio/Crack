@@ -61,7 +61,7 @@ public class MobSpawnObj implements ConfigurationSerializable {
     }
 
 
-    public static MobSpawnObj deserialize(ConfigurationSection mobSpawns) {
+    static MobSpawnObj deserialize(ConfigurationSection mobSpawns) {
         String mobName = mobSpawns.getString("mob");
         MobData mob = MobData.mobs.get(mobName);
         if (mob == null)
