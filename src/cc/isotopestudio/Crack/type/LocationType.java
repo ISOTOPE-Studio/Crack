@@ -11,11 +11,12 @@ public enum LocationType {
     LOBBY(S.toBoldGold("大厅")),
     GAME(S.toBoldGreen("房间中")),
     NONE(S.toBoldRed("不在游戏中")),
-    RESPAWN(S.toBoldDarkAqua("复活中"));
+    RESPAWN(S.toBoldDarkAqua("复活中")),
+    BOSS(S.toBoldGreen("BOSS"));
 
     private final String name;
 
-    LocationType(String name){
+    LocationType(String name) {
         this.name = name;
     }
 }

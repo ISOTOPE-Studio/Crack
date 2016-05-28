@@ -1,4 +1,6 @@
 Robot:
   type: ZOMBIE
+  health: 100
 Test:
-  type: ZOMBIE
+  type: SKELETON
+  name: ≤‚ ‘

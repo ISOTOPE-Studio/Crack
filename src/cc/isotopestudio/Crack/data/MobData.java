@@ -1,6 +1,8 @@
 package cc.isotopestudio.Crack.data;
 
+import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -13,7 +15,9 @@ import static cc.isotopestudio.Crack.Crack.plugin;
  */
 public class MobData {
     private final String name;
-    private EntityType type;
+    private final EntityType type;
+    private String displayName = null;
+    private int health = -1;
 
     public static HashMap<String, MobData> mobs;
 
@@ -29,6 +33,12 @@ public class MobData {
                 continue;
             }
             MobData mob = new MobData(mobName, type);
+            int maxHealth = plugin.getMobsData().getInt(mobName + ".health");
+            if (maxHealth > 0)
+                mob.health = maxHealth;
+            String display = plugin.getMobsData().getString(mobName + ".name");
+            if (display != null)
+                mob.displayName = display;
             mobs.put(mobName, mob);
         }
     }
@@ -46,8 +56,15 @@ public class MobData {
         return type;
     }
 
-    public void setType(EntityType type) {
-        this.type = type;
+    public LivingEntity spawn(Location loc) {
+        LivingEntity mob = (LivingEntity) loc.getWorld().spawn(loc, getType().getEntityClass());
+        if (health != -1) {
+            mob.setMaxHealth(health);
+            mob.setHealth(health);
+        }
+        if (displayName != null)
+            mob.setCustomName(displayName);
+        return mob;
     }
 
     @Override
@@ -55,6 +72,8 @@ public class MobData {
         return "MobData{" +
                 "name='" + name + '\'' +
                 ", type=" + type +
+                ", displayName='" + displayName + '\'' +
+                ", health=" + health +
                 '}';
     }
 }

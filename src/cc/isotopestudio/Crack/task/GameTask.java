@@ -5,11 +5,11 @@ import cc.isotopestudio.Crack.data.RoomData;
 import cc.isotopestudio.Crack.data.Settings;
 import cc.isotopestudio.Crack.type.RoomStatus;
 import cc.isotopestudio.Crack.utli.S;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 
+import static cc.isotopestudio.Crack.Crack.plugin;
 import static cc.isotopestudio.Crack.task.TaskManager.sendAllPlayers;
 
 /**
@@ -23,6 +23,9 @@ class GameTask extends BukkitRunnable {
     @Override
     public void run() {
         for (RoomData room : RoomData.rooms.values()) {
+
+            System.out.println(room.mobsKillCount + ": " + room.mobs + " / " + room.boss);
+
             if (!count.containsKey(room))
                 count.put(room, 0);
             else
@@ -32,17 +35,24 @@ class GameTask extends BukkitRunnable {
             if (room.getAlivePlayersNum() == 0) {
                 sendAllPlayers(room, S.toPrefixYellow("”Œœ∑Ω· ¯ :-("));
                 room.end();
-                return;
+                continue;
+            }
+            if (room.mobsKillCount > 20) {
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        sendAllPlayers(room, S.toPrefixRed("BOSS¿¥¡Ÿ!"));
+                        room.boss();
+                    }
+                }.runTaskLater(plugin, 20);
+                continue;
             }
             for (MobSpawnObj mobSpawnObj : room.getMobSpawnObj()) {
                 if (count.get(room) %
                         (mobSpawnObj.getFreq() < 0 ? Settings.mobSpawnFreq : mobSpawnObj.getFreq()) == 0)
-                    room.mobs.add(spawnMob(mobSpawnObj));
+                    room.mobs.add(mobSpawnObj.getMob().spawn(mobSpawnObj.getLocation()));
             }
         }
     }
 
-    private LivingEntity spawnMob(MobSpawnObj mobSpawnObj) {
-        return (LivingEntity) mobSpawnObj.getLocation().getWorld().spawn(mobSpawnObj.getLocation(), mobSpawnObj.getMob().getType().getEntityClass());
-    }
 }

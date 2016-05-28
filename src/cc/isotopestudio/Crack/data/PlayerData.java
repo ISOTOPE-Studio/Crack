@@ -48,6 +48,11 @@ public class PlayerData {
                 player.teleport(room.getRespawn());
                 break;
             }
+            case BOSS: {
+                plugin.getPlayerData().set(player.getName() + ".type", type.name());
+                player.teleport(room.getBossObj().getLocation());
+                break;
+            }
             case NONE: {
                 player.teleport(Utli.stringToLocation(plugin.getPlayerData().getString(player.getName() + ".location")));
                 plugin.getPlayerData().set(player.getName(), null);

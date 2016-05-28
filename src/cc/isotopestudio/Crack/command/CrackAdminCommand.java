@@ -8,11 +8,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 
 import java.util.List;
 
-public class CrackAdminCommand implements CommandExecutor, Listener {
+public class CrackAdminCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -74,7 +73,7 @@ public class CrackAdminCommand implements CommandExecutor, Listener {
                     player.sendMessage(S.toAqua("    重生点       ") + ((room.getRespawn() == null) ? S.toRed("未设置") : S.toGreen("已设置")));
                     player.sendMessage(S.toAqua("    怪物刷出点  ") +
                             ((room.getMobSpawnObj().size() == 0) ? S.toRed("未设置") : S.toGreen("已设置" + room.getMobSpawnObj().size() + "个")));
-                    player.sendMessage(S.toAqua("    BOSS生成点      ") + ((room.getBossLocation() == null) ? S.toRed("未设置") : S.toGreen("已设置")));
+                    player.sendMessage(S.toAqua("    BOSS生成点      ") + ((room.getBossObj() == null) ? S.toRed("未设置") : S.toGreen("已设置")));
                 }
                 player.sendMessage(S.toAqua("    最小/大玩家数量   ") + S.toGreen(room.getMinPlayer() + " / " + room.getMaxPlayer()));
                 player.sendMessage(S.toAqua("    玩家   ") + S.toGreen(room.getPlayersNames().toString()));
@@ -119,8 +118,13 @@ public class CrackAdminCommand implements CommandExecutor, Listener {
                     player.sendMessage(S.toPrefixGreen("成功设置 " + args[0] + " 的等待大厅"));
                     return true;
                 }
-                if (args[1].equalsIgnoreCase("boss")) {
-                    room.setBossLocation(player.getLocation());
+                if (args[1].equalsIgnoreCase("boss") && args.length > 2) {
+                    MobData mob = MobData.mobs.get(args[2]);
+                    if (mob == null) {
+                        player.sendMessage(S.toPrefixRed(args[2] + "不是是有效的怪物类型"));
+                        return true;
+                    }
+                    room.setBossLocation(player.getLocation(), mob);
                     player.sendMessage(S.toPrefixGreen("成功设置 " + args[0] + " 的BOSS生成点"));
                     return true;
                 }

@@ -28,10 +28,6 @@ public class TaskManager {
         GameTask gameTask = new GameTask();
         gameTask.runTaskTimer(plugin, 20, 20);
         tasks.add(gameTask);
-
-        MobSpawnTask mobSpawnTask = new MobSpawnTask();
-        mobSpawnTask.runTaskTimer(plugin, 20, 20);
-        tasks.add(mobSpawnTask);
     }
 
     public static void sendAllPlayers(RoomData room, String msg) {
