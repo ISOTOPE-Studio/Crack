@@ -1,5 +1,6 @@
 package cc.isotopestudio.Crack.data;
 
+import cc.isotopestudio.Crack.Room.Room;
 import cc.isotopestudio.Crack.task.TaskManager;
 import cc.isotopestudio.Crack.type.LocationType;
 import cc.isotopestudio.Crack.utli.S;
@@ -16,7 +17,7 @@ import static cc.isotopestudio.Crack.type.LocationType.NONE;
 public class PlayerData {
 
     public static void resetPlayer(String playerName) {
-        RoomData room = getRoom(playerName);
+        Room room = getRoom(playerName);
         if (room != null)
             room.removePlayer(playerName);
         plugin.getPlayerData().set(playerName, null);
@@ -29,7 +30,7 @@ public class PlayerData {
         return LocationType.valueOf(plugin.getPlayerData().getString(playerName + ".type"));
     }
 
-    public static boolean teleport(Player player, RoomData room, LocationType type) {
+    public static boolean teleport(Player player, Room room, LocationType type) {
         if (!room.isFinish()) return false;
         switch (type) {
             case LOBBY: {
@@ -68,8 +69,8 @@ public class PlayerData {
         return true;
     }
 
-    public static RoomData getRoom(String playerName) {
+    public static Room getRoom(String playerName) {
         if (getLocationType(playerName) == NONE) return null;
-        return RoomData.rooms.get(plugin.getPlayerData().getString(playerName + ".room"));
+        return Room.rooms.get(plugin.getPlayerData().getString(playerName + ".room"));
     }
 }

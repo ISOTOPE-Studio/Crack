@@ -1,7 +1,7 @@
 package cc.isotopestudio.Crack.task;
 
-import cc.isotopestudio.Crack.data.MobSpawnObj;
-import cc.isotopestudio.Crack.data.RoomData;
+import cc.isotopestudio.Crack.Room.MobSpawnObj;
+import cc.isotopestudio.Crack.Room.Room;
 import cc.isotopestudio.Crack.data.Settings;
 import cc.isotopestudio.Crack.type.RoomStatus;
 import cc.isotopestudio.Crack.utli.S;
@@ -18,11 +18,11 @@ import static cc.isotopestudio.Crack.task.TaskManager.sendAllPlayersTitle;
  */
 class GameTask extends BukkitRunnable {
 
-    private HashMap<RoomData, Integer> count = new HashMap<>();
+    private HashMap<Room, Integer> count = new HashMap<>();
 
     @Override
     public void run() {
-        for (RoomData room : RoomData.rooms.values()) {
+        for (Room room : Room.rooms.values()) {
             if (!count.containsKey(room))
                 count.put(room, 0);
             else
@@ -47,7 +47,8 @@ class GameTask extends BukkitRunnable {
             for (MobSpawnObj mobSpawnObj : room.getMobSpawnObj()) {
                 if (count.get(room) %
                         (mobSpawnObj.getFreq() < 0 ? Settings.mobSpawnFreq : mobSpawnObj.getFreq()) == 0)
-                    room.mobs.add(mobSpawnObj.getMob().spawn(mobSpawnObj.getLocation()));
+                    if (mobSpawnObj.isAvailble())
+                        room.mobs.add(mobSpawnObj.spawn());
             }
         }
     }

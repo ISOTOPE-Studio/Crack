@@ -1,7 +1,7 @@
 package cc.isotopestudio.Crack.listener;
 
 import cc.isotopestudio.Crack.data.PlayerData;
-import cc.isotopestudio.Crack.data.RoomData;
+import cc.isotopestudio.Crack.Room.Room;
 import cc.isotopestudio.Crack.type.LocationType;
 import cc.isotopestudio.Crack.type.PlayerStatus;
 import cc.isotopestudio.Crack.type.RoomStatus;
@@ -39,7 +39,7 @@ class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
-        RoomData room = PlayerData.getRoom(player.getName());
+        Room room = PlayerData.getRoom(player.getName());
         if (room == null) return;
         room.setPlayerStatus(player.getName(), PlayerStatus.DEATH);
         player.sendMessage(S.toPrefixRed("你死了!"));
@@ -48,7 +48,7 @@ class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        RoomData room = PlayerData.getRoom(player.getName());
+        Room room = PlayerData.getRoom(player.getName());
         if (room == null) return;
         PlayerData.teleport(player, room, LocationType.RESPAWN);
         player.sendTitle(S.toYellow("复活中..."), S.toAqua("还有 30 秒"));

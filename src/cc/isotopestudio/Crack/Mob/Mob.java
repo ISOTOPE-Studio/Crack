@@ -1,4 +1,4 @@
-package cc.isotopestudio.Crack.data;
+package cc.isotopestudio.Crack.Mob;
 
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
@@ -13,16 +13,20 @@ import static cc.isotopestudio.Crack.Crack.plugin;
  * Created by Mars on 5/27/2016.
  * Copyright ISOTOPE Studio
  */
-public class MobData {
-    private final String name;
-    private final EntityType type;
-    private String displayName = null;
-    private int health = -1;
+public class Mob {
+    protected final String name;
+    protected final EntityType type;
+    String displayName = null;
+    int health = -1;
+    int attack = -1;
 
-    public static HashMap<String, MobData> mobs;
+    public static HashMap<String, Mob> mobs;
 
     public static void update() {
         mobs = new HashMap<>();
+        mobs.put("Protector", new Protector());
+        mobs.put("Guardian", new Guardian());
+        mobs.put("Evil", new Evil());
         for (String mobName : plugin.getMobsData().getKeys(false)) {
             EntityType type;
             String typeName = plugin.getMobsData().getString(mobName + ".type");
@@ -32,7 +36,7 @@ public class MobData {
                 plugin.getLogger().log(Level.SEVERE, mobName + "中的" + typeName + "无效");
                 continue;
             }
-            MobData mob = new MobData(mobName, type);
+            Mob mob = new Mob(mobName, type);
             int maxHealth = plugin.getMobsData().getInt(mobName + ".health");
             if (maxHealth > 0)
                 mob.health = maxHealth;
@@ -43,7 +47,7 @@ public class MobData {
         }
     }
 
-    private MobData(String name, EntityType type) {
+    Mob(String name, EntityType type) {
         this.name = name;
         this.type = type;
     }
@@ -69,7 +73,7 @@ public class MobData {
 
     @Override
     public String toString() {
-        return "MobData{" +
+        return "Mob{" +
                 "name='" + name + '\'' +
                 ", type=" + type +
                 ", displayName='" + displayName + '\'' +

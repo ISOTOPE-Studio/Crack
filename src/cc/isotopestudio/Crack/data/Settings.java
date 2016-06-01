@@ -7,9 +7,8 @@ import static cc.isotopestudio.Crack.Crack.plugin;
  * Copyright ISOTOPE Studio
  */
 public class Settings {
-    public static int mobSpawnFreq = 3;
 
     public static void update() {
-        mobSpawnFreq = plugin.getConfig().getInt("mob.spawnfreq");
+
     }
 }

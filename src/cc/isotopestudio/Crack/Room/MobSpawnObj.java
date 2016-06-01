@@ -1,9 +1,11 @@
-package cc.isotopestudio.Crack.data;
+package cc.isotopestudio.Crack.Room;
 
+import cc.isotopestudio.Crack.Mob.Mob;
 import cc.isotopestudio.Crack.utli.Utli;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.entity.LivingEntity;
 
 import java.util.Map;
 
@@ -12,38 +14,45 @@ import java.util.Map;
  * Copyright ISOTOPE Studio
  */
 public class MobSpawnObj implements ConfigurationSerializable {
-    private Location loc;
-    private MobData mob;
-    private int freq;
+    private final Location loc;
+    private final Mob mob;
+    private final int freq;
+    private final int limit;
+    private int count = 0;
 
-    public MobSpawnObj(Location loc, MobData mob, int freq) {
+    public MobSpawnObj(Location loc, Mob mob, int freq, int limit) {
         this.loc = loc;
         this.mob = mob;
         this.freq = freq;
+        this.limit = limit;
     }
 
     public Location getLocation() {
         return loc;
     }
 
-    public void setLocation(Location loc) {
-        this.loc = loc;
-    }
-
-    public MobData getMob() {
+    public Mob getMob() {
         return mob;
-    }
-
-    public void setMob(MobData mob) {
-        this.mob = mob;
     }
 
     public int getFreq() {
         return freq;
     }
 
-    public void setFreq(int freq) {
-        this.freq = freq;
+    public int getLimit() {
+        return limit;
+    }
+
+    public void resetCount() {
+        count = 0;
+    }
+
+    public boolean isAvailble() {
+        return count < limit;
+    }
+
+    public LivingEntity spawn() {
+        return mob.spawn(loc);
     }
 
     @Override
@@ -52,22 +61,24 @@ public class MobSpawnObj implements ConfigurationSerializable {
                 "loc=" + Utli.locationToString(loc) +
                 ", mob=" + mob.getName() +
                 ", freq=" + freq +
+                ", limit=" + count + " / " + limit +
                 '}';
     }
 
     @Override
     public Map<String, Object> serialize() {
+        // TO-DO serialize
         return null;
     }
 
-
     static MobSpawnObj deserialize(ConfigurationSection mobSpawns) {
         String mobName = mobSpawns.getString("mob");
-        MobData mob = MobData.mobs.get(mobName);
+        Mob mob = Mob.mobs.get(mobName);
         if (mob == null)
             return null;
         Location loc = Utli.stringToLocation(mobSpawns.getString("location"));
         int freq = mobSpawns.getInt("freq");
-        return new MobSpawnObj(loc, mob, freq);
+        int limit = mobSpawns.getInt("limit");
+        return new MobSpawnObj(loc, mob, freq, limit);
     }
 }

@@ -1,9 +1,9 @@
 package cc.isotopestudio.Crack;
 
+import cc.isotopestudio.Crack.Room.Room;
 import cc.isotopestudio.Crack.command.CrackAdminCommand;
 import cc.isotopestudio.Crack.command.CrackCommand;
-import cc.isotopestudio.Crack.data.MobData;
-import cc.isotopestudio.Crack.data.RoomData;
+import cc.isotopestudio.Crack.Mob.Mob;
 import cc.isotopestudio.Crack.data.Settings;
 import cc.isotopestudio.Crack.listener.ListenerManager;
 import cc.isotopestudio.Crack.task.TaskManager;
@@ -41,13 +41,13 @@ public class Crack extends JavaPlugin {
             return;
         }
         Settings.update();
-        MobData.update();
+        Mob.update();
         clearPlayerData();
         ListenerManager.enable();
         TaskManager.enable();
         this.getCommand("CrackAdmin").setExecutor(new CrackAdminCommand());
         this.getCommand("Crack").setExecutor(new CrackCommand());
-        RoomData.update();
+        Room.update();
         getLogger().info(pluginName + "成功加载!");
         getLogger().info(pluginName + "由ISOTOPE Studio制作!");
         getLogger().info("http://isotopestudio.cc");
@@ -58,7 +58,7 @@ public class Crack extends JavaPlugin {
             @Override
             public void run() {
                 InfoGUI.text.setText("");
-                for (RoomData room : RoomData.rooms.values())
+                for (Room room : Room.rooms.values())
                     InfoGUI.text.append(room.toString() + "\n");
             }
         }.runTaskTimer(this, 20, 20);

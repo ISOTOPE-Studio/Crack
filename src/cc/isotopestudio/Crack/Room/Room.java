@@ -1,5 +1,7 @@
-package cc.isotopestudio.Crack.data;
+package cc.isotopestudio.Crack.Room;
 
+import cc.isotopestudio.Crack.Mob.Mob;
+import cc.isotopestudio.Crack.data.PlayerData;
 import cc.isotopestudio.Crack.task.TaskManager;
 import cc.isotopestudio.Crack.type.LocationType;
 import cc.isotopestudio.Crack.type.PlayerStatus;
@@ -17,10 +19,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.*;
 
 import static cc.isotopestudio.Crack.Crack.plugin;
-import static cc.isotopestudio.Crack.data.MobSpawnObj.deserialize;
+import static cc.isotopestudio.Crack.Room.MobSpawnObj.deserialize;
 
-public class RoomData {
-    public static HashMap<String, RoomData> rooms;
+public class Room {
+    public static HashMap<String, Room> rooms;
     private final String name;
     private final List<MobSpawnObj> mobSpawn;
     private final Set<String> players;
@@ -41,7 +43,7 @@ public class RoomData {
     private ArrayList<Integer> rewardPro;
     private int rewardProSum;
 
-    public RoomData(String name) {
+    public Room(String name) {
         this.name = name;
         mobSpawn = new ArrayList<>();
         players = new HashSet<>();
@@ -54,7 +56,7 @@ public class RoomData {
     public static void update() {
         rooms = new HashMap<>();
         for (String room : plugin.getRoomData().getKeys(false)) {
-            rooms.put(room, new RoomData(room));
+            rooms.put(room, new Room(room));
         }
     }
 
@@ -72,7 +74,6 @@ public class RoomData {
         if (mobSpawns != null)
             for (String line : mobSpawns.getKeys(false)) {
                 temp = plugin.getRoomData().getConfigurationSection(name + ".mobspawn." + line);
-                System.out.print(name + ".mobspawn." + line + ": " + (temp == null));
                 MobSpawnObj mobSpawnObj = deserialize(temp);
                 if (mobSpawnObj != null)
                     mobSpawn.add(mobSpawnObj);
@@ -148,8 +149,8 @@ public class RoomData {
         return bossSpawn;
     }
 
-    public void setBossLocation(Location loc, MobData mob) {
-        bossSpawn = new MobSpawnObj(loc, mob, -1);
+    public void setBossLocation(Location loc, Mob mob) {
+        bossSpawn = new MobSpawnObj(loc, mob, -1, -1);
         plugin.getRoomData().set(name + ".bossSpawn.location", Utli.locationToString(bossSpawn.getLocation()));
         plugin.getRoomData().set(name + ".bossSpawn.mob", bossSpawn.getMob().getName());
         plugin.getRoomData().set(name + ".bossSpawn.freq", bossSpawn.getFreq());
@@ -163,13 +164,14 @@ public class RoomData {
             plugin.getRoomData().set(name + ".mobspawn." + count + ".location", Utli.locationToString(mobSpawnObj.getLocation()));
             plugin.getRoomData().set(name + ".mobspawn." + count + ".mob", mobSpawnObj.getMob().getName());
             plugin.getRoomData().set(name + ".mobspawn." + count + ".freq", mobSpawnObj.getFreq());
+            plugin.getRoomData().set(name + ".mobspawn." + count + ".limit", mobSpawnObj.getLimit());
             count++;
         }
         plugin.saveRoomData();
     }
 
-    public void addMobSpawn(Location loc, MobData mob, int freq) {
-        MobSpawnObj mobSpawnObj = new MobSpawnObj(loc, mob, freq);
+    public void addMobSpawn(Location loc, Mob mob, int freq, int limit) {
+        MobSpawnObj mobSpawnObj = new MobSpawnObj(loc, mob, freq, limit);
         mobSpawn.add(mobSpawnObj);
         saveMobSpawn();
     }
@@ -343,7 +345,7 @@ public class RoomData {
 
     @Override
     public String toString() {
-        return "RoomData{" + "name='" + name + '\'' +
+        return "Room{" + "name='" + name + '\'' +
                 "\nmobSpawn=" + mobSpawn +
                 "\nplayers=" + players +
                 "\nplayersStatus=" + playersStatus +
@@ -360,16 +362,15 @@ public class RoomData {
                 "\nscheduleStart=" + scheduleStart +
                 "\nrewards=" + rewards +
                 "\nrewardPro=" + rewardPro +
-                "\nrewardProSum=" + rewardProSum +
                 '}';
     }
 
     private class TeleportTask extends BukkitRunnable {
 
-        private RoomData room;
+        private Room room;
         private Player player;
 
-        TeleportTask(RoomData room, Player player) {
+        TeleportTask(Room room, Player player) {
             this.room = room;
             this.player = player;
         }

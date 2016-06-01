@@ -1,7 +1,7 @@
 package cc.isotopestudio.Crack.gui;
 
+import cc.isotopestudio.Crack.Room.Room;
 import cc.isotopestudio.Crack.data.PlayerData;
-import cc.isotopestudio.Crack.data.RoomData;
 import cc.isotopestudio.Crack.type.LocationType;
 import cc.isotopestudio.Crack.type.RoomStatus;
 import cc.isotopestudio.Crack.utli.S;
@@ -16,7 +16,7 @@ public class CrackGUI extends GUI {
     public CrackGUI() {
         super(getName(S.toAqua("副本房间")), 9 * 6);
         int count = 0;
-        for (RoomData room : RoomData.rooms.values()) {
+        for (Room room : Room.rooms.values()) {
             if (count > 9 * 6) break;
             if (!room.isFinish()) {
                 continue;
@@ -56,7 +56,7 @@ public class CrackGUI extends GUI {
                 player.sendMessage(S.toPrefixRed("副本在游戏中"));
                 return;
             }
-            RoomData room = RoomData.rooms.get(ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName()));
+            Room room = Room.rooms.get(ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName()));
             if (room.getStatus() != RoomStatus.WAITING) {
 
                 return;

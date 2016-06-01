@@ -1,8 +1,8 @@
 package cc.isotopestudio.Crack.command;
 
-import cc.isotopestudio.Crack.data.MobData;
-import cc.isotopestudio.Crack.data.MobSpawnObj;
-import cc.isotopestudio.Crack.data.RoomData;
+import cc.isotopestudio.Crack.Mob.Mob;
+import cc.isotopestudio.Crack.Room.MobSpawnObj;
+import cc.isotopestudio.Crack.Room.Room;
 import cc.isotopestudio.Crack.utli.S;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -42,7 +42,7 @@ public class CrackAdminCommand implements CommandExecutor {
             }
             if (args[0].equalsIgnoreCase("list")) {
                 String result = S.toPrefixAqua("列表: ");
-                for (RoomData room : RoomData.rooms.values()) {
+                for (Room room : Room.rooms.values()) {
 
                     if (!room.isFinish())
                         result += S.toRed(room.getName());
@@ -55,11 +55,11 @@ public class CrackAdminCommand implements CommandExecutor {
             }
             if (args[0].equalsIgnoreCase("moblist")) {
                 String result = S.toPrefixAqua("怪物列表: ");
-                player.sendMessage(result + MobData.mobs.toString());
+                player.sendMessage(result + Mob.mobs.toString());
                 return true;
             }
             if (args.length == 1) {
-                RoomData room = RoomData.rooms.get(args[0]);
+                Room room = Room.rooms.get(args[0]);
                 if (room == null) {
                     player.sendMessage(S.toPrefixRed("副本房间 " + args[0] + " 不存在"));
                     return true;
@@ -86,19 +86,19 @@ public class CrackAdminCommand implements CommandExecutor {
                         player.sendMessage(S.toPrefixRed("请换个名字"));
                         return true;
                     }
-                    if (RoomData.rooms.get(args[0]) != null) {
+                    if (Room.rooms.get(args[0]) != null) {
                         player.sendMessage(S.toPrefixRed("副本房间" + args[0] + "已经存在"));
                         return true;
                     }
-                    RoomData room = new RoomData(args[0]);
-                    RoomData.rooms.put(args[0], room);
+                    Room room = new Room(args[0]);
+                    Room.rooms.put(args[0], room);
                     room.setMaxPlayer(10);
                     room.setMinPlayer(2);
                     player.sendMessage(S.toPrefixGreen("成功创建副本房间 " + args[0]));
                     player.sendMessage(S.toPrefixGreen("请继续设置大厅、出生点、重生点、BOSS生成点和怪物刷出点"));
                     return true;
                 }
-                RoomData room = RoomData.rooms.get(args[0]);
+                Room room = Room.rooms.get(args[0]);
                 if (room == null) {
                     player.sendMessage(S.toPrefixRed("副本房间 " + args[0] + " 不存在"));
                     return true;
@@ -119,7 +119,7 @@ public class CrackAdminCommand implements CommandExecutor {
                     return true;
                 }
                 if (args[1].equalsIgnoreCase("boss") && args.length > 2) {
-                    MobData mob = MobData.mobs.get(args[2]);
+                    Mob mob = Mob.mobs.get(args[2]);
                     if (mob == null) {
                         player.sendMessage(S.toPrefixRed(args[2] + "不是是有效的怪物类型"));
                         return true;
@@ -129,21 +129,35 @@ public class CrackAdminCommand implements CommandExecutor {
                     return true;
                 }
                 if (args[1].equalsIgnoreCase("mob") && args.length > 2) {
-                    if (args.length > 3 && args[2].equalsIgnoreCase("add")) {
-                        MobData mob = MobData.mobs.get(args[3]);
+                    if (args[2].equalsIgnoreCase("add")) {
+                        if (!(args.length > 5)) {
+                            player.sendMessage(S.toBoldGreen("/" + label + " <房间名> mob add <怪物类型> <刷新频率/s> <刷新次数>") + S.toGray(" - ") + S.toGold("添加副本房间怪物刷出点"));
+                            return true;
+                        }
+
+                        Mob mob = Mob.mobs.get(args[3]);
                         if (mob == null) {
                             player.sendMessage(S.toPrefixRed(args[3] + "不是是有效的怪物类型"));
                             return true;
                         }
-                        int freq = -1;
-                        if (args.length > 4) {
-                            try {
-                                freq = Integer.parseInt(args[4]);
-                            } catch (Exception e) {
-                                player.sendMessage(S.toPrefixRed(args[4] + "不是数字"));
-                            }
+
+                        int freq;
+                        try {
+                            freq = Integer.parseInt(args[4]);
+                        } catch (Exception e) {
+                            player.sendMessage(S.toPrefixRed(args[4] + "不是数字"));
+                            return true;
                         }
-                        room.addMobSpawn(player.getLocation(), mob, freq);
+
+                        int limit;
+                        try {
+                            limit = Integer.parseInt(args[5]);
+                        } catch (Exception e) {
+                            player.sendMessage(S.toPrefixRed(args[5] + "不是数字"));
+                            return true;
+                        }
+
+                        room.addMobSpawn(player.getLocation(), mob, freq, limit);
                         player.sendMessage(S.toPrefixGreen("成功添加 " + args[0] + " 的怪物刷出点"));
                         return true;
                     }
@@ -233,7 +247,7 @@ public class CrackAdminCommand implements CommandExecutor {
     private void sendHelpPage2(CommandSender player, String label) {
         player.sendMessage(S.toPrefixGreen("帮助菜单 第 2 页"));
         player.sendMessage(S.toBoldGreen("/" + label + " moblist") + S.toGray(" - ") + S.toGold("查看已设置的怪物类型"));
-        player.sendMessage(S.toBoldGreen("/" + label + " <房间名> mob add <怪物类型> [刷新频率/s]") + S.toGray(" - ") + S.toGold("添加副本房间怪物刷出点"));
+        player.sendMessage(S.toBoldGreen("/" + label + " <房间名> mob add <怪物类型> <刷新频率/s> <刷新次数>") + S.toGray(" - ") + S.toGold("添加副本房间怪物刷出点"));
         player.sendMessage(S.toBoldGreen("/" + label + " <房间名> mob list") + S.toGray(" - ") + S.toGold("查看副本房间怪物刷出点列表"));
         player.sendMessage(S.toBoldGreen("/" + label + " <房间名> mob delete <编号>") + S.toGray(" - ") + S.toGold("查看副本房间怪物刷出点列表"));
         player.sendMessage(S.toBoldGreen("/" + label + " <房间名> mob clear") + S.toGray(" - ") + S.toGold("清除副本房间怪物刷出点列表"));

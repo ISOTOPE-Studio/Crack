@@ -1,7 +1,7 @@
 package cc.isotopestudio.Crack.gui;
 
 import cc.isotopestudio.Crack.data.PlayerData;
-import cc.isotopestudio.Crack.data.RoomData;
+import cc.isotopestudio.Crack.Room.Room;
 import cc.isotopestudio.Crack.type.LocationType;
 import cc.isotopestudio.Crack.utli.S;
 import org.bukkit.Material;
@@ -11,9 +11,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class GameGUI extends GUI {
-    private final RoomData room;
+    private final Room room;
 
-    public GameGUI(RoomData room) {
+    public GameGUI(Room room) {
         super(getName(S.toAqua("副本房间")), 9);
         this.room = room;
         setOption(0, new ItemStack(Material.DIAMOND_SWORD), S.toAqua(room.getName()),

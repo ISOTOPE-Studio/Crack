@@ -1,6 +1,6 @@
 package cc.isotopestudio.Crack.listener;
 
-import cc.isotopestudio.Crack.data.RoomData;
+import cc.isotopestudio.Crack.Room.Room;
 import cc.isotopestudio.Crack.type.RoomStatus;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,7 +14,7 @@ class MobListener implements Listener {
 
     @EventHandler
     public void onMobDeath(EntityDeathEvent event) {
-        for (RoomData room : RoomData.rooms.values()) {
+        for (Room room : Room.rooms.values()) {
             if (room.getStatus() == RoomStatus.WAITING) {
                 continue;
             }

@@ -1,6 +1,6 @@
 package cc.isotopestudio.Crack.task;
 
-import cc.isotopestudio.Crack.data.RoomData;
+import cc.isotopestudio.Crack.Room.Room;
 import cc.isotopestudio.Crack.type.RoomStatus;
 import cc.isotopestudio.Crack.utli.S;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -25,7 +25,7 @@ class LobbyTask extends BukkitRunnable {
     public void run() {
         waitCount++;
         if (waitCount == waitInterval) waitCount = 0;
-        for (RoomData room : RoomData.rooms.values()) {
+        for (Room room : Room.rooms.values()) {
             if (room.getStatus() != RoomStatus.WAITING)
                 continue;
 
