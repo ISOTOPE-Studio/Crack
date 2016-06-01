@@ -25,7 +25,8 @@ public class Utli {
         return new Location(world, x, y, z);
     }
 
-    public static int getRandom(int min, int max) {
-        return (int) (Math.random() * (max - min) + min + 1);
+    public static int random(int min, int max) {
+        double ran = Math.random() * (max - min + 1) + min;
+        return (int) ran;
     }
 }

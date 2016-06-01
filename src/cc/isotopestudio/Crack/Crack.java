@@ -11,6 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +51,18 @@ public class Crack extends JavaPlugin {
         getLogger().info(pluginName + "成功加载!");
         getLogger().info(pluginName + "由ISOTOPE Studio制作!");
         getLogger().info("http://isotopestudio.cc");
+
+        new InfoGUI().run();
+        InfoGUI.text.setWrapStyleWord(true);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                InfoGUI.text.setText("");
+                for (RoomData room : RoomData.rooms.values())
+                    InfoGUI.text.append(room.toString() + "\n");
+            }
+        }.runTaskTimer(this, 20, 20);
+
     }
 
     @Override

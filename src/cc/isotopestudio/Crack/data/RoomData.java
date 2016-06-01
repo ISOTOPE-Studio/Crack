@@ -8,6 +8,7 @@ import cc.isotopestudio.Crack.utli.S;
 import cc.isotopestudio.Crack.utli.Utli;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -36,11 +37,16 @@ public class RoomData {
     private int maxPlayer;
     private long scheduleStart = -1;
 
+    private List<String> rewards;
+    private ArrayList<Integer> rewardPro;
+    private int rewardProSum;
+
     public RoomData(String name) {
         this.name = name;
         mobSpawn = new ArrayList<>();
         players = new HashSet<>();
         mobs = new HashSet<>();
+        rewards = new ArrayList<>();
         playersStatus = new HashMap<>();
         insertInfo();
     }
@@ -74,11 +80,29 @@ public class RoomData {
         minPlayer = plugin.getRoomData().getInt(name + ".min");
         maxPlayer = plugin.getRoomData().getInt(name + ".max");
         status = RoomStatus.WAITING;
+        boolean hasReward = false;
+        rewards.clear();
+        rewards.addAll(plugin.getRoomData().getStringList(name + ".reward"));
+        if (rewards.size() == 0) {
+            rewards.add("give %player% diamond 1;give %player% stone 64;5");
+            plugin.getRoomData().set(name + ".reward", rewards);
+        }
+        rewardPro = new ArrayList<Integer>();
+        rewardProSum = 0;
+        for (int i = 0; i < rewards.size(); i++) {
+            String reward = rewards.get(i);
+            String[] s = reward.split(";");
+            int pro = Integer.parseInt(s[s.length - 1]);
+            if (i == 0)
+                rewardPro.add(pro);
+            else
+                rewardPro.add(pro + rewardPro.get(i - 1));
+            rewardProSum += pro;
+        }
         plugin.getRoomData().set(name + ".players", null);
         plugin.saveRoomData();
         System.out.println(mobSpawn);
     }
-
 
     private Location getLocation(String key) {
         return Utli.stringToLocation(plugin.getRoomData().getString(name + "." + key, null));
@@ -261,6 +285,26 @@ public class RoomData {
 
     public void win() {
         TaskManager.sendAllPlayersTitle(this, S.toGreen("Ê¤Àû£¡"), S.toAqua("»ñµÃ½±Àø"));
+        for (String playerName : players) {
+            final Player player = Bukkit.getPlayer(playerName);
+            if (player == null) continue;
+            int n = Utli.random(0, rewardProSum);
+            int index = 0;
+            while (true) {
+                if (rewardPro.get(index) < n) {
+                    index++;
+                    continue;
+                }
+                break;
+            }
+            String line = rewards.get(index);
+            line = line.replace("%player%", player.getName());
+            String commands[] = line.split(";");
+            ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
+            for (int i = 0; i < commands.length - 1; i++) {
+                Bukkit.dispatchCommand(console, commands[i]);
+            }
+        }
         end();
     }
 
@@ -297,12 +341,35 @@ public class RoomData {
         }
     }
 
-    class TeleportTask extends BukkitRunnable {
+    @Override
+    public String toString() {
+        return "RoomData{" + "name='" + name + '\'' +
+                "\nmobSpawn=" + mobSpawn +
+                "\nplayers=" + players +
+                "\nplayersStatus=" + playersStatus +
+                "\nmobs=" + mobs +
+                "\nboss=" + boss +
+                "\nmobsKillCount=" + mobsKillCount +
+                "\nlobby=" + (lobby != null) +
+                "\nspawn=" + (spawn != null) +
+                "\nrespawn=" + (respawn != null) +
+                "\nbossSpawn=" + (bossSpawn != null) +
+                "\nstatus=" + status +
+                "\nminPlayer=" + minPlayer +
+                "\nmaxPlayer=" + maxPlayer +
+                "\nscheduleStart=" + scheduleStart +
+                "\nrewards=" + rewards +
+                "\nrewardPro=" + rewardPro +
+                "\nrewardProSum=" + rewardProSum +
+                '}';
+    }
+
+    private class TeleportTask extends BukkitRunnable {
 
         private RoomData room;
         private Player player;
 
-        public TeleportTask(RoomData room, Player player) {
+        TeleportTask(RoomData room, Player player) {
             this.room = room;
             this.player = player;
         }
