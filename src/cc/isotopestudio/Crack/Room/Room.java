@@ -20,6 +20,7 @@ import java.util.*;
 
 import static cc.isotopestudio.Crack.Crack.plugin;
 import static cc.isotopestudio.Crack.Room.MobSpawnObj.deserialize;
+import static cc.isotopestudio.Crack.task.TaskManager.sendAllPlayersTitle;
 
 public class Room {
     public static HashMap<String, Room> rooms;
@@ -264,6 +265,9 @@ public class Room {
     public void start() {
         killAllMobs();
         mobsKillCount = 0;
+        for (MobSpawnObj mobSpawnObj : mobSpawn) {
+            mobSpawnObj.resetCount();
+        }
         setScheduleStart(-1);
         setStatus(RoomStatus.PROGRESS);
         for (String playerName : getPlayersNames()) {
@@ -276,10 +280,19 @@ public class Room {
     public void boss() {
         killAllMobs();
         setStatus(RoomStatus.BOSS);
-        boss = bossSpawn.getMob().spawn(bossSpawn.getLocation());
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (status == RoomStatus.BOSS)
+                    boss = bossSpawn.getMob().spawn(bossSpawn.getLocation());
+            }
+        }.runTaskLater(plugin, 20 * 5);
+
         for (String playerName : getPlayersNames()) {
             Player player = Bukkit.getPlayer(playerName);
             if (player == null) continue;
+            sendAllPlayersTitle(this, S.toBoldRed("红色警报"), S.toRed("还有5秒 BOSS来临!"));
             PlayerData.teleport(player, this, LocationType.BOSS);
         }
 

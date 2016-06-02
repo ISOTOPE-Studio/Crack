@@ -52,6 +52,7 @@ public class MobSpawnObj implements ConfigurationSerializable {
     }
 
     public LivingEntity spawn() {
+        count++;
         return mob.spawn(loc);
     }
 

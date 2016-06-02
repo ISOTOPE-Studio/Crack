@@ -1,12 +1,11 @@
 package cc.isotopestudio.Crack.listener;
 
-import cc.isotopestudio.Crack.data.PlayerData;
 import cc.isotopestudio.Crack.Room.Room;
+import cc.isotopestudio.Crack.data.PlayerData;
 import cc.isotopestudio.Crack.type.LocationType;
 import cc.isotopestudio.Crack.type.PlayerStatus;
 import cc.isotopestudio.Crack.type.RoomStatus;
 import cc.isotopestudio.Crack.utli.S;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -52,7 +51,7 @@ class PlayerListener implements Listener {
         if (room == null) return;
         PlayerData.teleport(player, room, LocationType.RESPAWN);
         player.sendTitle(S.toYellow("复活中..."), S.toAqua("还有 30 秒"));
-        Bukkit.getScheduler().runTaskLater(plugin, new BukkitRunnable() {
+        new BukkitRunnable() {
             @Override
             public void run() {
                 if (!player.isOnline()) {
@@ -64,7 +63,7 @@ class PlayerListener implements Listener {
                     player.sendMessage(S.toPrefixYellow("传送到房间"));
                 }
             }
-        }, 30 * 20);
+        }.runTaskLater(plugin, 30 * 20);
     }
 
 }

@@ -2,7 +2,6 @@ package cc.isotopestudio.Crack.task;
 
 import cc.isotopestudio.Crack.Room.MobSpawnObj;
 import cc.isotopestudio.Crack.Room.Room;
-import cc.isotopestudio.Crack.data.Settings;
 import cc.isotopestudio.Crack.type.RoomStatus;
 import cc.isotopestudio.Crack.utli.S;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -38,15 +37,13 @@ class GameTask extends BukkitRunnable {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        sendAllPlayersTitle(room, S.toBoldRed("ºìÉ«¾¯±¨"), S.toRed("BOSSÀ´ÁÙ!"));
                         room.boss();
                     }
                 }.runTaskLater(plugin, 20);
                 continue;
             }
             for (MobSpawnObj mobSpawnObj : room.getMobSpawnObj()) {
-                if (count.get(room) %
-                        (mobSpawnObj.getFreq() < 0 ? Settings.mobSpawnFreq : mobSpawnObj.getFreq()) == 0)
+                if (count.get(room) % mobSpawnObj.getFreq() == 0)
                     if (mobSpawnObj.isAvailble())
                         room.mobs.add(mobSpawnObj.spawn());
             }

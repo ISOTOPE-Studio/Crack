@@ -39,7 +39,7 @@ class Evil extends Mob {
     */
 
     Evil() {
-        super("Protector", EntityType.WITHER);
+        super("Evil", EntityType.WITHER);
         displayName = S.toRed("[BOSS]Òì½ç¶ñÄ§");
         health = 20000;
         attack = 2;
