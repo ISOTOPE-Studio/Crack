@@ -16,9 +16,12 @@ public class ListenerManager {
 
         PlayerListener playerListener = new PlayerListener();
         MobListener mobListener = new MobListener();
+        ProtectionListener blockListener = new ProtectionListener();
 
         PluginManager pm = plugin.getServer().getPluginManager();
         pm.registerEvents(playerListener, plugin);
         pm.registerEvents(mobListener, plugin);
+        pm.registerEvents(blockListener, plugin);
+
     }
 }
