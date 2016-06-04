@@ -1,7 +1,9 @@
-package cc.isotopestudio.Crack.Mob;
+package cc.isotopestudio.Crack.mob;
 
 import cc.isotopestudio.Crack.utli.S;
+import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 /**
@@ -43,6 +45,11 @@ class Evil extends Mob {
         displayName = S.toRed("[BOSS]Òì½ç¶ñÄ§");
         health = 20000;
         attack = 2;
+    }
+
+    @Override
+    public LivingEntity spawn(Location loc) {
+        return super.spawn(loc);
     }
 
     public void onAttack(EntityDamageByEntityEvent event) {

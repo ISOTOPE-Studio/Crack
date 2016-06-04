@@ -1,6 +1,6 @@
 package cc.isotopestudio.Crack.task;
 
-import cc.isotopestudio.Crack.Room.Room;
+import cc.isotopestudio.Crack.room.Room;
 import cc.isotopestudio.Crack.type.RoomStatus;
 import cc.isotopestudio.Crack.utli.S;
 import org.bukkit.scheduler.BukkitRunnable;

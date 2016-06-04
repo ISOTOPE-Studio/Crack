@@ -1,6 +1,6 @@
 package cc.isotopestudio.Crack.listener;
 
-import cc.isotopestudio.Crack.Room.Room;
+import cc.isotopestudio.Crack.room.Room;
 import cc.isotopestudio.Crack.type.RoomStatus;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

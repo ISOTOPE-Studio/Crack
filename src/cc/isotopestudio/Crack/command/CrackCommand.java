@@ -1,6 +1,6 @@
 package cc.isotopestudio.Crack.command;
 
-import cc.isotopestudio.Crack.Room.Room;
+import cc.isotopestudio.Crack.room.Room;
 import cc.isotopestudio.Crack.data.PlayerData;
 import cc.isotopestudio.Crack.gui.CrackGUI;
 import cc.isotopestudio.Crack.gui.GameGUI;

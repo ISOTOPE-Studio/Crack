@@ -1,8 +1,8 @@
 package cc.isotopestudio.Crack.command;
 
-import cc.isotopestudio.Crack.Mob.Mob;
-import cc.isotopestudio.Crack.Room.MobSpawnObj;
-import cc.isotopestudio.Crack.Room.Room;
+import cc.isotopestudio.Crack.mob.Mob;
+import cc.isotopestudio.Crack.room.MobSpawnObj;
+import cc.isotopestudio.Crack.room.Room;
 import cc.isotopestudio.Crack.utli.S;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

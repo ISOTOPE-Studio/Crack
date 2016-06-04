@@ -1,7 +1,7 @@
-package cc.isotopestudio.Crack.Room;
+package cc.isotopestudio.Crack.room;
 
-import cc.isotopestudio.Crack.Mob.Mob;
 import cc.isotopestudio.Crack.data.PlayerData;
+import cc.isotopestudio.Crack.mob.Mob;
 import cc.isotopestudio.Crack.task.TaskManager;
 import cc.isotopestudio.Crack.type.LocationType;
 import cc.isotopestudio.Crack.type.PlayerStatus;
@@ -19,7 +19,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.*;
 
 import static cc.isotopestudio.Crack.Crack.plugin;
-import static cc.isotopestudio.Crack.Room.MobSpawnObj.deserialize;
+import static cc.isotopestudio.Crack.room.MobSpawnObj.deserialize;
 import static cc.isotopestudio.Crack.task.TaskManager.sendAllPlayersTitle;
 
 public class Room {
@@ -331,6 +331,7 @@ public class Room {
         }
         clearPlayers();
         setStatus(RoomStatus.WAITING);
+        new SendTitleTask(this).runTaskLater(plugin, 20);
     }
 
     public long getScheduleStart() {
@@ -358,7 +359,7 @@ public class Room {
 
     @Override
     public String toString() {
-        return "Room{" + "name='" + name + '\'' +
+        return "room{" + "name='" + name + '\'' +
                 "\nmobSpawn=" + mobSpawn +
                 "\nplayers=" + players +
                 "\nplayersStatus=" + playersStatus +
@@ -392,6 +393,20 @@ public class Room {
         public void run() {
             if (player == null || !player.isOnline()) return;
             PlayerData.teleport(player, room, LocationType.NONE);
+        }
+    }
+
+    private class SendTitleTask extends BukkitRunnable {
+
+        private Room room;
+
+        SendTitleTask(Room room) {
+            this.room = room;
+        }
+
+        @Override
+        public void run() {
+            sendAllPlayersTitle(room, S.toBoldRed("无人幸存"), S.toYellow("游戏结束 :-("));
         }
     }
 }

@@ -1,8 +1,10 @@
-package cc.isotopestudio.Crack.Mob;
+package cc.isotopestudio.Crack.mob;
 
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.PluginManager;
 
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -13,7 +15,7 @@ import static cc.isotopestudio.Crack.Crack.plugin;
  * Created by Mars on 5/27/2016.
  * Copyright ISOTOPE Studio
  */
-public class Mob {
+public class Mob implements Listener {
     protected final String name;
     protected final EntityType type;
     String displayName = null;
@@ -45,6 +47,10 @@ public class Mob {
                 mob.displayName = display;
             mobs.put(mobName, mob);
         }
+        PluginManager pm = plugin.getServer().getPluginManager();
+        for (Mob mob : mobs.values()) {
+            pm.registerEvents(mob, plugin);
+        }
     }
 
     Mob(String name, EntityType type) {
@@ -73,7 +79,7 @@ public class Mob {
 
     @Override
     public String toString() {
-        return "Mob{" +
+        return "mob{" +
                 "name='" + name + '\'' +
                 ", type=" + type +
                 ", displayName='" + displayName + '\'' +

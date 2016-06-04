@@ -60,7 +60,8 @@ class ProtectionListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onEntityChangeBlock(EntityTeleportEvent event) {
+    public void onEntityTeleport(EntityTeleportEvent event) {
+        System.out.println("EnderMan!");
         event.setCancelled(true);
     }
 

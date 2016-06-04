@@ -1,7 +1,7 @@
 package cc.isotopestudio.Crack.listener;
 
-import cc.isotopestudio.Crack.Room.Room;
 import cc.isotopestudio.Crack.data.PlayerData;
+import cc.isotopestudio.Crack.room.Room;
 import cc.isotopestudio.Crack.type.LocationType;
 import cc.isotopestudio.Crack.type.PlayerStatus;
 import cc.isotopestudio.Crack.type.RoomStatus;
@@ -42,6 +42,8 @@ class PlayerListener implements Listener {
         if (room == null) return;
         room.setPlayerStatus(player.getName(), PlayerStatus.DEATH);
         player.sendMessage(S.toPrefixRed("ƒ„À¿¡À!"));
+        if (room.getAlivePlayersNum() == 0)
+            room.end();
     }
 
     @EventHandler

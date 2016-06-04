@@ -1,11 +1,11 @@
 package cc.isotopestudio.Crack;
 
-import cc.isotopestudio.Crack.Room.Room;
 import cc.isotopestudio.Crack.command.CrackAdminCommand;
 import cc.isotopestudio.Crack.command.CrackCommand;
-import cc.isotopestudio.Crack.Mob.Mob;
 import cc.isotopestudio.Crack.data.Settings;
 import cc.isotopestudio.Crack.listener.ListenerManager;
+import cc.isotopestudio.Crack.mob.Mob;
+import cc.isotopestudio.Crack.room.Room;
 import cc.isotopestudio.Crack.task.TaskManager;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -40,17 +40,16 @@ public class Crack extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        Settings.update();
-        Mob.update();
         clearPlayerData();
+        Settings.update();
         ListenerManager.enable();
+        Mob.update();
         TaskManager.enable();
+
+        Room.update();
+
         this.getCommand("CrackAdmin").setExecutor(new CrackAdminCommand());
         this.getCommand("Crack").setExecutor(new CrackCommand());
-        Room.update();
-        getLogger().info(pluginName + "成功加载!");
-        getLogger().info(pluginName + "由ISOTOPE Studio制作!");
-        getLogger().info("http://isotopestudio.cc");
 
         new InfoGUI().run();
         InfoGUI.text.setWrapStyleWord(true);
@@ -62,6 +61,10 @@ public class Crack extends JavaPlugin {
                     InfoGUI.text.append(room.toString() + "\n");
             }
         }.runTaskTimer(this, 20, 20);
+
+        getLogger().info(pluginName + "成功加载!");
+        getLogger().info(pluginName + "由ISOTOPE Studio制作!");
+        getLogger().info("http://isotopestudio.cc");
 
     }
 

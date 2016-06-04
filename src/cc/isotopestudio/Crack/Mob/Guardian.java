@@ -1,4 +1,4 @@
-package cc.isotopestudio.Crack.Mob;
+package cc.isotopestudio.Crack.mob;
 
 import cc.isotopestudio.Crack.utli.S;
 import org.bukkit.entity.EntityType;

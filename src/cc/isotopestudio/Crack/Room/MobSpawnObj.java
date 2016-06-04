@@ -1,10 +1,9 @@
-package cc.isotopestudio.Crack.Room;
+package cc.isotopestudio.Crack.room;
 
-import cc.isotopestudio.Crack.Mob.Mob;
+import cc.isotopestudio.Crack.mob.Mob;
 import cc.isotopestudio.Crack.utli.Utli;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.LivingEntity;
 
 import java.util.Map;
@@ -13,7 +12,7 @@ import java.util.Map;
  * Created by Mars on 5/27/2016.
  * Copyright ISOTOPE Studio
  */
-public class MobSpawnObj implements ConfigurationSerializable {
+public class MobSpawnObj {
     private final Location loc;
     private final Mob mob;
     private final int freq;
@@ -66,8 +65,7 @@ public class MobSpawnObj implements ConfigurationSerializable {
                 '}';
     }
 
-    @Override
-    public Map<String, Object> serialize() {
+    public ConfigurationSection serialize() {
         // TO-DO serialize
         return null;
     }

@@ -1,6 +1,6 @@
 package cc.isotopestudio.Crack.data;
 
-import cc.isotopestudio.Crack.Room.Room;
+import cc.isotopestudio.Crack.room.Room;
 import cc.isotopestudio.Crack.task.TaskManager;
 import cc.isotopestudio.Crack.type.LocationType;
 import cc.isotopestudio.Crack.utli.S;

@@ -1,7 +1,7 @@
 package cc.isotopestudio.Crack.task;
 
-import cc.isotopestudio.Crack.Room.MobSpawnObj;
-import cc.isotopestudio.Crack.Room.Room;
+import cc.isotopestudio.Crack.room.MobSpawnObj;
+import cc.isotopestudio.Crack.room.Room;
 import cc.isotopestudio.Crack.type.RoomStatus;
 import cc.isotopestudio.Crack.utli.S;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -29,7 +29,7 @@ class GameTask extends BukkitRunnable {
             if (room.getStatus() != RoomStatus.PROGRESS)
                 continue;
             if (room.getAlivePlayersNum() == 0) {
-                sendAllPlayersTitle(room, S.toBoldRed("无人幸存"), S.toYellow("游戏结束 :-("));
+
                 room.end();
                 continue;
             }
