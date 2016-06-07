@@ -11,6 +11,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
 
@@ -26,7 +28,6 @@ class Protector extends Mob implements Listener {
     血量：100
     伤害：40（不是真实伤害可以被护甲抵消）
     被动技能：速度1级，攻击造成1秒失明
-    主动技能：无
     */
 
     Protector() {
@@ -36,9 +37,13 @@ class Protector extends Mob implements Listener {
         attack = 40;
     }
 
+    private static final PotionEffect SPEED = new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1, false);
+    private static final PotionEffect BLINDNESS = new PotionEffect(PotionEffectType.BLINDNESS, 1, 1, false);
+
     @Override
     public LivingEntity spawn(Location loc) {
         LivingEntity entity = super.spawn(loc);
+        entity.addPotionEffect(SPEED);
         List<Entity> nearbys = entity.getNearbyEntities(10, 10, 10);
         for (Entity nearby : nearbys)
             if (nearby instanceof Player) {
@@ -51,8 +56,11 @@ class Protector extends Mob implements Listener {
     @EventHandler
     public void onAttack(EntityDamageByEntityEvent event) {
         Entity attacker = event.getDamager();
+        if (!(event.getEntity() instanceof Player)) return;
+        Player player = (Player) event.getEntity();
         if (attacker.getType() == type &&
-                attacker.getCustomName() != null && attacker.getCustomName().equals(S.toRed("异界守护者"))) {
+                attacker.getCustomName() != null && attacker.getCustomName().equals(displayName)) {
+            player.addPotionEffect(BLINDNESS);
             event.setDamage(attack);
         }
     }
