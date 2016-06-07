@@ -7,8 +7,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Date;
 
-import static cc.isotopestudio.Crack.task.TaskManager.sendAllPlayers;
-import static cc.isotopestudio.Crack.task.TaskManager.sendAllPlayersTitle;
+import static cc.isotopestudio.Crack.utli.Utli.sendAllPlayers;
+import static cc.isotopestudio.Crack.utli.Utli.sendAllPlayersTitle;
 
 /**
  * Created by Mars on 5/21/2016.

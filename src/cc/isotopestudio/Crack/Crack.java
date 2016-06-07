@@ -82,7 +82,7 @@ public class Crack extends JavaPlugin {
     private File roomDataFile = null;
     private FileConfiguration roomData = null;
 
-    public void reloadRoomData() {
+    private void reloadRoomData() {
         if (roomDataFile == null) {
             roomDataFile = new File(getDataFolder(), "rooms.yml");
         }
@@ -110,7 +110,7 @@ public class Crack extends JavaPlugin {
     private File playerDataFile = null;
     private FileConfiguration playerData = null;
 
-    public void reloadPlayerData() {
+    private void reloadPlayerData() {
         if (playerDataFile == null) {
             playerDataFile = new File(getDataFolder(), "players.yml");
         }
@@ -146,7 +146,7 @@ public class Crack extends JavaPlugin {
     private File mobsDataFile = null;
     private FileConfiguration mobsData = null;
 
-    public void reloadMobsData() {
+    private void reloadMobsData() {
         if (mobsDataFile == null) {
             this.saveResource("mobs.yml", false);
         }

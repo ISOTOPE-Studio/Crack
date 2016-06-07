@@ -1,9 +1,11 @@
 package cc.isotopestudio.Crack.mob;
 
+import cc.isotopestudio.Crack.room.Room;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.PluginManager;
 
 import java.util.HashMap;
@@ -15,7 +17,7 @@ import static cc.isotopestudio.Crack.Crack.plugin;
  * Created by Mars on 5/27/2016.
  * Copyright ISOTOPE Studio
  */
-public class Mob implements Listener {
+public abstract class Mob implements Listener {
     protected final String name;
     protected final EntityType type;
     String displayName = null;
@@ -38,7 +40,7 @@ public class Mob implements Listener {
                 plugin.getLogger().log(Level.SEVERE, mobName + "中的" + typeName + "无效");
                 continue;
             }
-            Mob mob = new Mob(mobName, type);
+            Mob mob = new CustomMob(mobName, type);
             int maxHealth = plugin.getMobsData().getInt(mobName + ".health");
             if (maxHealth > 0)
                 mob.health = maxHealth;
@@ -58,11 +60,11 @@ public class Mob implements Listener {
         this.type = type;
     }
 
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
-    public EntityType getType() {
+    public final EntityType getType() {
         return type;
     }
 
@@ -76,6 +78,10 @@ public class Mob implements Listener {
             mob.setCustomName(displayName);
         return mob;
     }
+
+    public abstract void onAttack(EntityDamageByEntityEvent event);
+
+    public abstract void onSkill(Room room, LivingEntity mob);
 
     @Override
     public String toString() {

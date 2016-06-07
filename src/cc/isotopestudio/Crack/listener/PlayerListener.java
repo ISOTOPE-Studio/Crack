@@ -46,6 +46,7 @@ class PlayerListener implements Listener {
             room.end();
     }
 
+    @SuppressWarnings("deprecation")
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();

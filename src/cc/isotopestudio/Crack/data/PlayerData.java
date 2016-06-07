@@ -1,7 +1,6 @@
 package cc.isotopestudio.Crack.data;
 
 import cc.isotopestudio.Crack.room.Room;
-import cc.isotopestudio.Crack.task.TaskManager;
 import cc.isotopestudio.Crack.type.LocationType;
 import cc.isotopestudio.Crack.utli.S;
 import cc.isotopestudio.Crack.utli.Utli;
@@ -37,7 +36,7 @@ public class PlayerData {
                 plugin.getPlayerData().set(player.getName() + ".location", Utli.locationToString(player.getLocation()));
                 plugin.getPlayerData().set(player.getName() + ".type", type.name());
                 plugin.getPlayerData().set(player.getName() + ".room", room.getName());
-                TaskManager.sendAllPlayers(room, S.toPrefixGreen(player.getName()+" 加入房间"));
+                Utli.sendAllPlayers(room, S.toPrefixGreen(player.getName()+" 加入房间"));
                 room.addPlayer(player.getName());
                 player.teleport(room.getLobby());
                 break;
@@ -50,7 +49,7 @@ public class PlayerData {
             case RESPAWN: {
                 plugin.getPlayerData().set(player.getName() + ".type", type.name());
                 player.teleport(room.getRespawn());
-                TaskManager.sendAllPlayers(room, S.toPrefixRed(player.getName()+" 等待复活"));
+                Utli.sendAllPlayers(room, S.toPrefixRed(player.getName()+" 等待复活"));
                 break;
             }
             case BOSS: {

@@ -2,7 +2,6 @@ package cc.isotopestudio.Crack.room;
 
 import cc.isotopestudio.Crack.data.PlayerData;
 import cc.isotopestudio.Crack.mob.Mob;
-import cc.isotopestudio.Crack.task.TaskManager;
 import cc.isotopestudio.Crack.type.LocationType;
 import cc.isotopestudio.Crack.type.PlayerStatus;
 import cc.isotopestudio.Crack.type.RoomStatus;
@@ -12,7 +11,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -20,27 +18,25 @@ import java.util.*;
 
 import static cc.isotopestudio.Crack.Crack.plugin;
 import static cc.isotopestudio.Crack.room.MobSpawnObj.deserialize;
-import static cc.isotopestudio.Crack.task.TaskManager.sendAllPlayersTitle;
+import static cc.isotopestudio.Crack.utli.Utli.sendAllPlayersTitle;
 
 public class Room {
     public static HashMap<String, Room> rooms;
     private final String name;
-    private final List<MobSpawnObj> mobSpawn;
     private final Set<String> players;
     private final HashMap<String, PlayerStatus> playersStatus;
-    public Set<LivingEntity> mobs;
-    public LivingEntity boss;
     public int mobsKillCount = 0;
     private Location lobby;
     private Location spawn;
     private Location respawn;
-    private MobSpawnObj bossSpawn;
+    private final List<MobSpawnObj> mobSpawn;
+    private MobSpawnObj bossObj;
     private RoomStatus status;
     private int minPlayer;
     private int maxPlayer;
     private long scheduleStart = -1;
 
-    private List<String> rewards;
+    private final List<String> rewards;
     private ArrayList<Integer> rewardPro;
     private int rewardProSum;
 
@@ -48,7 +44,6 @@ public class Room {
         this.name = name;
         mobSpawn = new ArrayList<>();
         players = new HashSet<>();
-        mobs = new HashSet<>();
         rewards = new ArrayList<>();
         playersStatus = new HashMap<>();
         insertInfo();
@@ -65,24 +60,23 @@ public class Room {
         lobby = getLocation("lobby");
         spawn = getLocation("spawn");
         respawn = getLocation("respawn");
-        ConfigurationSection temp = plugin.getRoomData().getConfigurationSection(name + ".bossSpawn");
+        ConfigurationSection temp = plugin.getRoomData().getConfigurationSection(name + ".bossObj");
         if (temp != null) {
-            MobSpawnObj bossTemp = deserialize(temp);
+            MobSpawnObj bossTemp = deserialize(temp, this);
             if (bossTemp != null)
-                bossSpawn = bossTemp;
+                bossObj = bossTemp;
         }
         ConfigurationSection mobSpawns = plugin.getRoomData().getConfigurationSection(name + ".mobspawn");
         if (mobSpawns != null)
             for (String line : mobSpawns.getKeys(false)) {
                 temp = plugin.getRoomData().getConfigurationSection(name + ".mobspawn." + line);
-                MobSpawnObj mobSpawnObj = deserialize(temp);
+                MobSpawnObj mobSpawnObj = deserialize(temp, this);
                 if (mobSpawnObj != null)
                     mobSpawn.add(mobSpawnObj);
             }
         minPlayer = plugin.getRoomData().getInt(name + ".min");
         maxPlayer = plugin.getRoomData().getInt(name + ".max");
         status = RoomStatus.WAITING;
-        boolean hasReward = false;
         rewards.clear();
         rewards.addAll(plugin.getRoomData().getStringList(name + ".reward"));
         if (rewards.size() == 0) {
@@ -103,7 +97,6 @@ public class Room {
         }
         plugin.getRoomData().set(name + ".players", null);
         plugin.saveRoomData();
-        System.out.println(mobSpawn);
     }
 
     private Location getLocation(String key) {
@@ -147,14 +140,14 @@ public class Room {
     }
 
     public MobSpawnObj getBossObj() {
-        return bossSpawn;
+        return bossObj;
     }
 
     public void setBossLocation(Location loc, Mob mob) {
-        bossSpawn = new MobSpawnObj(loc, mob, -1, -1);
-        plugin.getRoomData().set(name + ".bossSpawn.location", Utli.locationToString(bossSpawn.getLocation()));
-        plugin.getRoomData().set(name + ".bossSpawn.mob", bossSpawn.getMob().getName());
-        plugin.getRoomData().set(name + ".bossSpawn.freq", bossSpawn.getFreq());
+        bossObj = new MobSpawnObj(loc, mob, -1, -1, this);
+        plugin.getRoomData().set(name + ".bossObj.location", Utli.locationToString(bossObj.getLocation()));
+        plugin.getRoomData().set(name + ".bossObj.mob", bossObj.getMob().getName());
+        plugin.getRoomData().set(name + ".bossObj.freq", bossObj.getFreq());
         plugin.saveRoomData();
     }
 
@@ -172,7 +165,7 @@ public class Room {
     }
 
     public void addMobSpawn(Location loc, Mob mob, int freq, int limit) {
-        MobSpawnObj mobSpawnObj = new MobSpawnObj(loc, mob, freq, limit);
+        MobSpawnObj mobSpawnObj = new MobSpawnObj(loc, mob, freq, limit, this);
         mobSpawn.add(mobSpawnObj);
         saveMobSpawn();
     }
@@ -194,7 +187,7 @@ public class Room {
     }
 
     public boolean isFinish() {
-        return lobby != null && spawn != null && respawn != null && bossSpawn != null && mobSpawn.size() > 0;
+        return lobby != null && spawn != null && respawn != null && bossObj != null && mobSpawn.size() > 0;
     }
 
     public int getMinPlayer() {
@@ -252,14 +245,10 @@ public class Room {
     }
 
     private void killAllMobs() {
-        for (LivingEntity mob : mobs) {
-            mob.setHealth(0);
+        for (MobSpawnObj mob : mobSpawn) {
+            mob.clear();
         }
-        mobs.clear();
-        if (boss != null) {
-            boss.setHealth(0);
-            boss = null;
-        }
+        bossObj.clear();
     }
 
     public void start() {
@@ -285,7 +274,7 @@ public class Room {
             @Override
             public void run() {
                 if (status == RoomStatus.BOSS)
-                    boss = bossSpawn.getMob().spawn(bossSpawn.getLocation());
+                    bossObj.spawn();
             }
         }.runTaskLater(plugin, 20 * 5);
 
@@ -299,7 +288,7 @@ public class Room {
     }
 
     public void win() {
-        TaskManager.sendAllPlayersTitle(this, S.toGreen("胜利！"), S.toAqua("获得奖励"));
+        Utli.sendAllPlayersTitle(this, S.toGreen("胜利！"), S.toAqua("获得奖励"));
         for (String playerName : players) {
             final Player player = Bukkit.getPlayer(playerName);
             if (player == null) continue;
@@ -363,13 +352,11 @@ public class Room {
                 "\nmobSpawn=" + mobSpawn +
                 "\nplayers=" + players +
                 "\nplayersStatus=" + playersStatus +
-                "\nmobs=" + mobs +
-                "\nboss=" + boss +
                 "\nmobsKillCount=" + mobsKillCount +
                 "\nlobby=" + (lobby != null) +
                 "\nspawn=" + (spawn != null) +
                 "\nrespawn=" + (respawn != null) +
-                "\nbossSpawn=" + (bossSpawn != null) +
+                "\nbossObj=" + (bossObj != null) +
                 "\nstatus=" + status +
                 "\nminPlayer=" + minPlayer +
                 "\nmaxPlayer=" + maxPlayer +
@@ -381,8 +368,8 @@ public class Room {
 
     private class TeleportTask extends BukkitRunnable {
 
-        private Room room;
-        private Player player;
+        private final Room room;
+        private final Player player;
 
         TeleportTask(Room room, Player player) {
             this.room = room;
@@ -398,7 +385,7 @@ public class Room {
 
     private class SendTitleTask extends BukkitRunnable {
 
-        private Room room;
+        private final Room room;
 
         SendTitleTask(Room room) {
             this.room = room;

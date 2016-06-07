@@ -1,5 +1,6 @@
 package cc.isotopestudio.Crack.mob;
 
+import cc.isotopestudio.Crack.room.Room;
 import cc.isotopestudio.Crack.utli.S;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -7,7 +8,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
@@ -20,7 +20,7 @@ import java.util.List;
  * Created by Mars on 6/1/2016.
  * Copyright ISOTOPE Studio
  */
-class Protector extends Mob implements Listener {
+class Protector extends Mob {
 
     /*
     怪物名：&c异界守护者
@@ -53,6 +53,7 @@ class Protector extends Mob implements Listener {
         return entity;
     }
 
+    @Override
     @EventHandler
     public void onAttack(EntityDamageByEntityEvent event) {
         Entity attacker = event.getDamager();
@@ -63,5 +64,10 @@ class Protector extends Mob implements Listener {
             player.addPotionEffect(BLINDNESS);
             event.setDamage(attack);
         }
+    }
+
+    @Override
+    public void onSkill(Room room, LivingEntity mob) {
+
     }
 }

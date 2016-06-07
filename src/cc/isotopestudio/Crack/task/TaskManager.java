@@ -1,8 +1,5 @@
 package cc.isotopestudio.Crack.task;
 
-import cc.isotopestudio.Crack.room.Room;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -14,7 +11,7 @@ import static cc.isotopestudio.Crack.Crack.plugin;
  * Copyright ISOTOPE Studio
  */
 public class TaskManager {
-    private static ArrayList<BukkitRunnable> tasks = new ArrayList<>();
+    private static final ArrayList<BukkitRunnable> tasks = new ArrayList<>();
 
     public static void enable() {
         for (BukkitRunnable task : tasks) {
@@ -34,19 +31,4 @@ public class TaskManager {
         tasks.add(dateTask);
     }
 
-    public static void sendAllPlayers(Room room, String msg) {
-        for (String playerName : room.getPlayersNames()) {
-            Player player = Bukkit.getPlayer(playerName);
-            if (player == null) continue;
-            player.sendMessage(msg);
-        }
-    }
-
-    public static void sendAllPlayersTitle(Room room, String title, String subtitle) {
-        for (String playerName : room.getPlayersNames()) {
-            Player player = Bukkit.getPlayer(playerName);
-            if (player == null) continue;
-            player.sendTitle(title, subtitle);
-        }
-    }
 }

@@ -20,17 +20,17 @@ public abstract class GUI implements Listener {
 
     // From: https://bukkit.org/threads/icon-menu.108342
 
-    protected final String name;
-    protected final int size;
-    protected OptionClickEventHandler[] handler;
-    protected Crack plugin;
-    protected String[] optionNames;
-    protected ItemStack[] optionIcons;
+    final String name;
+    final int size;
+    private OptionClickEventHandler[] handler;
+    private Crack plugin;
+    String[] optionNames;
+    ItemStack[] optionIcons;
     protected int page;
     protected HashMap<Integer, Integer> slotIDMap;
-    protected boolean isDestoryed = false;
+    private boolean isDestoryed = false;
 
-    public GUI(String name, int size) {
+    GUI(String name, int size) {
         this.name = name;
         this.size = size;
         this.plugin = Crack.plugin;
@@ -39,17 +39,9 @@ public abstract class GUI implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    public GUI setOption(int position, ItemStack icon, String name, String... info) {
+    void setOption(int position, ItemStack icon, String name, String... info) {
         optionNames[position] = name;
         optionIcons[position] = setItemNameAndLore(icon, name, info);
-        return this;
-    }
-
-    public GUI setOption(int position, ItemStack item) {
-        optionNames[position] = item.getItemMeta() == null ? item.getType().toString()
-                : item.getItemMeta().getDisplayName();
-        optionIcons[position] = item;
-        return this;
     }
 
     public void open(Player player) {
@@ -62,7 +54,7 @@ public abstract class GUI implements Listener {
         player.openInventory(inventory);
     }
 
-    public void Destory() {
+    private void Destory() {
         isDestoryed = true;
         HandlerList.unregisterAll(this);
         handler = null;
@@ -98,7 +90,7 @@ public abstract class GUI implements Listener {
         return item;
     }
 
-    public static String getName(String a) {
+    static String getName(String a) {
         for (int i = 0; i <= 5; i++) {
             switch ((int) (Math.random() * 5)) {
                 case (0): {
@@ -131,9 +123,9 @@ public abstract class GUI implements Listener {
     }
 
     public class OptionClickEvent {
-        private Player player;
-        private int position;
-        private String name;
+        private final Player player;
+        private final int position;
+        private final String name;
         private boolean close;
         private boolean destroy;
 

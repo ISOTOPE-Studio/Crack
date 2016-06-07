@@ -1,8 +1,10 @@
 package cc.isotopestudio.Crack.mob;
 
+import cc.isotopestudio.Crack.room.Room;
 import cc.isotopestudio.Crack.utli.S;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
@@ -50,6 +52,8 @@ class Guardian extends Mob {
         return entity;
     }
 
+    @Override
+    @EventHandler
     public void onAttack(EntityDamageByEntityEvent event) {
         Entity attacker = event.getDamager();
         if (!(event.getEntity() instanceof Player)) return;
@@ -57,7 +61,13 @@ class Guardian extends Mob {
         if (attacker.getType() == type &&
                 attacker.getCustomName() != null && attacker.getCustomName().equals(displayName)) {
             player.addPotionEffect(WITHER);
+            event.setDamage(0);
             player.setHealth((player.getHealth() < attack ? 0 : player.getHealth() - attack));
         }
+    }
+
+    @Override
+    public void onSkill(Room room, LivingEntity mob) {
+
     }
 }

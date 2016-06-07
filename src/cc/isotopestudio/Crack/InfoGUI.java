@@ -8,7 +8,7 @@ import java.awt.*;
  * Copyright ISOTOPE Studio
  */
 public class InfoGUI extends JFrame {
-    public static JTextArea text = new JTextArea();
+    public static final JTextArea text = new JTextArea();
 
     public void run() {
         JFrame fm = new JFrame("Crack Debug");

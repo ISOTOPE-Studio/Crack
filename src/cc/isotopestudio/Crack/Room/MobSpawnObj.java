@@ -5,8 +5,12 @@ import cc.isotopestudio.Crack.utli.Utli;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
+
+import static cc.isotopestudio.Crack.Crack.plugin;
 
 /**
  * Created by Mars on 5/27/2016.
@@ -17,13 +21,18 @@ public class MobSpawnObj {
     private final Mob mob;
     private final int freq;
     private final int limit;
+    private final Room room;
     private int count = 0;
+    private final Set<LivingEntity> mobs;
+    private BukkitRunnable task;
 
-    public MobSpawnObj(Location loc, Mob mob, int freq, int limit) {
+    MobSpawnObj(Location loc, Mob mob, int freq, int limit, Room room) {
         this.loc = loc;
         this.mob = mob;
         this.freq = freq;
         this.limit = limit;
+        this.room = room;
+        mobs = new HashSet<>();
     }
 
     public Location getLocation() {
@@ -50,9 +59,33 @@ public class MobSpawnObj {
         return count < limit;
     }
 
-    public LivingEntity spawn() {
+    public Set<LivingEntity> getMobs() {
+        return mobs;
+    }
+
+    public void spawn() {
+        mobs.add(mob.spawn(loc));
+        if (task == null) { // First run
+            task = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    for (LivingEntity entity : mobs)
+                        if (entity.getHealth() > 0)
+                            mob.onSkill(room, entity);
+                }
+            };
+            task.runTaskTimer(plugin, 1, 20);
+        }
         count++;
-        return mob.spawn(loc);
+    }
+
+
+    public void clear() {
+        if (task != null)
+            task.cancel();
+        for (LivingEntity mob : mobs) {
+            mob.setHealth(0);
+        }
     }
 
     @Override
@@ -62,6 +95,7 @@ public class MobSpawnObj {
                 ", mob=" + mob.getName() +
                 ", freq=" + freq +
                 ", limit=" + count + " / " + limit +
+                ", mobs=" + mobs +
                 '}';
     }
 
@@ -70,7 +104,7 @@ public class MobSpawnObj {
         return null;
     }
 
-    static MobSpawnObj deserialize(ConfigurationSection mobSpawns) {
+    static MobSpawnObj deserialize(ConfigurationSection mobSpawns, Room room) {
         String mobName = mobSpawns.getString("mob");
         Mob mob = Mob.mobs.get(mobName);
         if (mob == null)
@@ -78,6 +112,6 @@ public class MobSpawnObj {
         Location loc = Utli.stringToLocation(mobSpawns.getString("location"));
         int freq = mobSpawns.getInt("freq");
         int limit = mobSpawns.getInt("limit");
-        return new MobSpawnObj(loc, mob, freq, limit);
+        return new MobSpawnObj(loc, mob, freq, limit, room);
     }
 }
