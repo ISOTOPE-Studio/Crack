@@ -6,6 +6,7 @@ import cc.isotopestudio.Crack.type.LocationType;
 import cc.isotopestudio.Crack.type.PlayerStatus;
 import cc.isotopestudio.Crack.type.RoomStatus;
 import cc.isotopestudio.Crack.utli.S;
+import cc.isotopestudio.Crack.utli.Utli;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -42,8 +43,9 @@ class PlayerListener implements Listener {
         if (room == null) return;
         room.setPlayerStatus(player.getName(), PlayerStatus.DEATH);
         player.sendMessage(S.toPrefixRed("你死了!"));
-        if (room.getAlivePlayersNum() == 0)
-            room.end();
+        if (room.getAlivePlayersNum() == 0) {
+            room.lose();
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -52,21 +54,35 @@ class PlayerListener implements Listener {
         Player player = event.getPlayer();
         Room room = PlayerData.getRoom(player.getName());
         if (room == null) return;
-        PlayerData.teleport(player, room, LocationType.RESPAWN);
-        player.sendTitle(S.toYellow("复活中..."), S.toAqua("还有 30 秒"));
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!player.isOnline()) {
-                    return;
+        if (room.getStatus() == RoomStatus.WAITING) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    PlayerData.teleport(player, room, LocationType.NONE);
                 }
-                if (room.getStatus() != RoomStatus.WAITING) {
-                    PlayerData.teleport(player, room, LocationType.GAME);
-                    room.setPlayerStatus(player.getName(), PlayerStatus.GAME);
-                    player.sendMessage(S.toPrefixYellow("传送到房间"));
+            }.runTaskLater(plugin, 1);
+        } else {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    PlayerData.teleport(player, room, LocationType.RESPAWN);
                 }
-            }
-        }.runTaskLater(plugin, 30 * 20);
+            }.runTaskLater(plugin, 1);
+            player.sendTitle(S.toYellow("复活中..."), S.toAqua("还有 30 秒"));
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (!player.isOnline()) {
+                        return;
+                    }
+                    if (room.getStatus() != RoomStatus.WAITING) {
+                        PlayerData.teleport(player, room, LocationType.GAME);
+                        room.setPlayerStatus(player.getName(), PlayerStatus.GAME);
+                        Utli.sendAllPlayers(room, S.toGreen(player.getName() + "复活"));
+                        player.sendMessage(S.toPrefixYellow("传送到房间"));
+                    }
+                }
+            }.runTaskLater(plugin, 30 * 20);
+        }
     }
-
 }

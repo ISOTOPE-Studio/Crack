@@ -29,6 +29,12 @@ public class PlayerData {
         return LocationType.valueOf(plugin.getPlayerData().getString(playerName + ".type"));
     }
 
+    public static void addTime(String playerName) {
+        int count = plugin.getPlayerData().getInt("player.times");
+        plugin.getPlayerData().set("player.times",++count);
+        plugin.savePlayerData();
+    }
+
     public static boolean teleport(Player player, Room room, LocationType type) {
         if (!room.isFinish()) return false;
         switch (type) {
@@ -36,7 +42,7 @@ public class PlayerData {
                 plugin.getPlayerData().set(player.getName() + ".location", Utli.locationToString(player.getLocation()));
                 plugin.getPlayerData().set(player.getName() + ".type", type.name());
                 plugin.getPlayerData().set(player.getName() + ".room", room.getName());
-                Utli.sendAllPlayers(room, S.toPrefixGreen(player.getName()+" 加入房间"));
+                Utli.sendAllPlayers(room, S.toPrefixGreen(player.getName() + " 加入房间"));
                 room.addPlayer(player.getName());
                 player.teleport(room.getLobby());
                 break;
@@ -49,7 +55,7 @@ public class PlayerData {
             case RESPAWN: {
                 plugin.getPlayerData().set(player.getName() + ".type", type.name());
                 player.teleport(room.getRespawn());
-                Utli.sendAllPlayers(room, S.toPrefixRed(player.getName()+" 等待复活"));
+                Utli.sendAllPlayers(room, S.toPrefixRed(player.getName() + " 等待复活"));
                 break;
             }
             case BOSS: {
@@ -58,9 +64,12 @@ public class PlayerData {
                 break;
             }
             case NONE: {
-                player.teleport(Utli.stringToLocation(plugin.getPlayerData().getString(player.getName() + ".location")));
-                plugin.getPlayerData().set(player.getName(), null);
-                room.removePlayer(player.getName());
+                if (plugin.getPlayerData().getString(player.getName() + ".location") != null) {
+                    player.teleport(Utli.stringToLocation(plugin.getPlayerData().getString(player.getName() + ".location")));
+                    System.out.println(Utli.stringToLocation(plugin.getPlayerData().getString(player.getName() + ".location")));
+                    plugin.getPlayerData().set(player.getName(), null);
+                    room.removePlayer(player.getName());
+                }
                 break;
             }
         }

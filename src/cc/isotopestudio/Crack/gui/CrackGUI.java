@@ -1,7 +1,7 @@
 package cc.isotopestudio.Crack.gui;
 
-import cc.isotopestudio.Crack.room.Room;
 import cc.isotopestudio.Crack.data.PlayerData;
+import cc.isotopestudio.Crack.room.Room;
 import cc.isotopestudio.Crack.type.LocationType;
 import cc.isotopestudio.Crack.type.RoomStatus;
 import cc.isotopestudio.Crack.utli.S;
@@ -53,22 +53,24 @@ public class CrackGUI extends GUI {
             }
             Player player = (Player) event.getWhoClicked();
             if (optionIcons[slot] == null) {
-                player.sendMessage(S.toPrefixRed("副本在游戏中"));
                 return;
             }
             Room room = Room.rooms.get(ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName()));
             if (room.getStatus() != RoomStatus.WAITING) {
-
+                player.sendMessage(S.toPrefixRed("副本在游戏中"));
+                player.closeInventory();
                 return;
             }
             OptionClickEvent e = new OptionClickEvent(player, slot, optionNames[slot]);
 
             LocationType type = PlayerData.getLocationType(player.getName());
             if (type == LocationType.NONE) {
-                PlayerData.teleport(player, room
-                        ,
-                        LocationType.LOBBY);
-                player.sendMessage(S.toPrefixGreen("传送到游戏大厅"));
+                if (room.getPlayerNum() >= room.getMaxPlayer()) {
+                    player.sendMessage(S.toPrefixRed("人数已满"));
+                } else {
+                    PlayerData.teleport(player, room, LocationType.LOBBY);
+                    player.sendMessage(S.toPrefixGreen("传送到游戏大厅"));
+                }
             }
             if (e.willClose()) {
                 player.closeInventory();

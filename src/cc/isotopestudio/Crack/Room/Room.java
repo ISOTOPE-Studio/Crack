@@ -18,6 +18,7 @@ import java.util.*;
 
 import static cc.isotopestudio.Crack.Crack.plugin;
 import static cc.isotopestudio.Crack.room.MobSpawnObj.deserialize;
+import static cc.isotopestudio.Crack.utli.Utli.sendAllPlayers;
 import static cc.isotopestudio.Crack.utli.Utli.sendAllPlayersTitle;
 
 public class Room {
@@ -60,7 +61,7 @@ public class Room {
         lobby = getLocation("lobby");
         spawn = getLocation("spawn");
         respawn = getLocation("respawn");
-        ConfigurationSection temp = plugin.getRoomData().getConfigurationSection(name + ".bossObj");
+        ConfigurationSection temp = plugin.getRoomData().getConfigurationSection(name + ".bossSpawn");
         if (temp != null) {
             MobSpawnObj bossTemp = deserialize(temp, this);
             if (bossTemp != null)
@@ -145,9 +146,9 @@ public class Room {
 
     public void setBossLocation(Location loc, Mob mob) {
         bossObj = new MobSpawnObj(loc, mob, -1, -1, this);
-        plugin.getRoomData().set(name + ".bossObj.location", Utli.locationToString(bossObj.getLocation()));
-        plugin.getRoomData().set(name + ".bossObj.mob", bossObj.getMob().getName());
-        plugin.getRoomData().set(name + ".bossObj.freq", bossObj.getFreq());
+        plugin.getRoomData().set(name + ".bossSpawn.location", Utli.locationToString(bossObj.getLocation()));
+        plugin.getRoomData().set(name + ".bossSpawn.mob", bossObj.getMob().getName());
+        plugin.getRoomData().set(name + ".bossSpawn.freq", bossObj.getFreq());
         plugin.saveRoomData();
     }
 
@@ -231,7 +232,7 @@ public class Room {
         return players;
     }
 
-    public void clearPlayers() {
+    private void clearPlayers() {
         players.clear();
         playersStatus.clear();
     }
@@ -264,6 +265,10 @@ public class Room {
             if (player == null) continue;
             PlayerData.teleport(player, this, LocationType.GAME);
         }
+        sendAllPlayersTitle(this, S.toGreen("开始游戏!"), S.toBoldPurple("怪物来袭"));
+        for (int i = 0; i < 10; i++) {
+            sendAllPlayers(this, "");
+        }
     }
 
     public void boss() {
@@ -290,6 +295,7 @@ public class Room {
     public void win() {
         Utli.sendAllPlayersTitle(this, S.toGreen("胜利！"), S.toAqua("获得奖励"));
         for (String playerName : players) {
+            PlayerData.addTime(playerName);
             final Player player = Bukkit.getPlayer(playerName);
             if (player == null) continue;
             int n = Utli.random(0, rewardProSum);
@@ -312,7 +318,12 @@ public class Room {
         end();
     }
 
-    public void end() {
+    public void lose() {
+        new SendTitleTask(this).runTaskLater(plugin, 20);
+        end();
+    }
+
+    private void end() {
         killAllMobs();
         for (String playerName : players) {
             final Player player = Bukkit.getPlayer(playerName);
@@ -320,7 +331,6 @@ public class Room {
         }
         clearPlayers();
         setStatus(RoomStatus.WAITING);
-        new SendTitleTask(this).runTaskLater(plugin, 20);
     }
 
     public long getScheduleStart() {

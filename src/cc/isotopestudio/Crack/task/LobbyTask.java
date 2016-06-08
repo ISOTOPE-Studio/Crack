@@ -45,7 +45,6 @@ class LobbyTask extends BukkitRunnable {
                 room.setScheduleStart(-1);
             }
             if (getRemainSec(room.getScheduleStart()) == 0) {
-                sendAllPlayersTitle(room, S.toGreen("开始游戏!"), S.toBoldPurple("怪物来袭"));
                 room.start();
             }
             if (waitCount == 0)

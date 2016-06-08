@@ -12,6 +12,7 @@ import static cc.isotopestudio.Crack.Crack.plugin;
  * Copyright ISOTOPE Studio
  */
 class DateTask extends BukkitRunnable {
+
     @Override
     public void run() {
         Date todayDate = new Date();
@@ -22,13 +23,10 @@ class DateTask extends BukkitRunnable {
         if (date == null) {
             plugin.getPlayerData().set("date", today);
             plugin.savePlayerData();
-            return;
-        }
-
-        if (!date.equals(today)) {
-
+        } else if (!date.equals(today)) {
             for (String key : plugin.getPlayerData().getKeys(false)) {
-                plugin.getPlayerData().set(key + ".times", 0);
+                if (!key.equals("date"))
+                    plugin.getPlayerData().set(key + ".times", 0);
             }
             plugin.savePlayerData();
         }

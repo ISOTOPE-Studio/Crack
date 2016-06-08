@@ -27,8 +27,7 @@ class GameTask extends BukkitRunnable {
             if (room.getStatus() != RoomStatus.PROGRESS)
                 continue;
             if (room.getAlivePlayersNum() == 0) {
-
-                room.end();
+                room.lose();
                 continue;
             }
             if (room.mobsKillCount > 20) {
