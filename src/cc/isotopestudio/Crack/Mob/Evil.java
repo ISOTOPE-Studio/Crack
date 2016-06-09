@@ -1,6 +1,8 @@
 package cc.isotopestudio.Crack.mob;
 
 import cc.isotopestudio.Crack.room.Room;
+import cc.isotopestudio.Crack.type.RoomStatus;
+import cc.isotopestudio.Crack.utli.ParticleEffect;
 import cc.isotopestudio.Crack.utli.S;
 import cc.isotopestudio.Crack.utli.Utli;
 import org.bukkit.Location;
@@ -10,6 +12,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
+
+import java.util.List;
+
+import static cc.isotopestudio.Crack.Crack.plugin;
 
 /**
  * Created by Mars on 6/1/2016.
@@ -53,7 +61,7 @@ class Evil extends Mob implements Listener {
     }
 
     private static final PotionEffect SPEED = new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2, false);
-    private static final PotionEffect WITHER = new PotionEffect(PotionEffectType.WITHER, 3, 1, false);
+    private static final PotionEffect WITHER = new PotionEffect(PotionEffectType.WITHER, 3 * 20, 1, false);
 
     @Override
     public LivingEntity spawn(Location loc) {
@@ -86,23 +94,78 @@ class Evil extends Mob implements Listener {
     public void onSkill(Room room, LivingEntity mob) {
         System.out.println(1);
         if (Utli.random(3)) {
-            onSkill1(room);
+            onSkill1(room, mob);
         } else if (Utli.random(6)) {
-            onSkill2(room);
+            onSkill2(room, mob);
         } else if (Utli.random(9)) {
-            onSkill3(room);
+            onSkill3(room, mob);
         }
     }
 
-    private void onSkill1(Room room) {
+    private static final PotionEffect SLOW = new PotionEffect(PotionEffectType.SLOW, 5 * 20, 2, false);
+    private static final PotionEffect BLINDNESS = new PotionEffect(PotionEffectType.BLINDNESS, 5 * 20, 2, false);
+
+    private void onSkill1(Room room, LivingEntity mob) {
         Utli.sendAllPlayers(room, "§d§l[BOSS]异界恶魔:§c你陷入了梦魇当中...");
+        for (Player player : room.getAlivePlayer()) {
+            player.addPotionEffect(SLOW);
+            player.addPotionEffect(BLINDNESS);
+            System.out.println("player" + player.getName() + ": " + SLOW + BLINDNESS);
+        }
     }
 
-    private void onSkill2(Room room) {
+    private void onSkill2(Room room, LivingEntity mob) {
         Utli.sendAllPlayers(room, "§6§l[提示]:§a异界恶魔即将释放恶魔之力,请尽快远离！");
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (room.getStatus() != RoomStatus.WAITING && mob.getHealth() > 0) {
+                    List<Entity> nearby = mob.getNearbyEntities(12, 12, 12);
+                    for (Entity entity : nearby) {
+                        if (!(entity instanceof Player)) continue;
+                        Player player = (Player) entity;
+                        if (!room.getAlivePlayer().contains(player)) continue;
+                        player.sendMessage("§6§l[提示]:§c你被异界恶魔的恶魔之力所吸引了！");
+                        ParticleEffect.PORTAL.display(0, 0, 0, 1, 20, player.getEyeLocation(), 50);
+                        Vector v = mob.getEyeLocation().subtract(player.getEyeLocation()).toVector().normalize().multiply(2);
+                        player.setVelocity(v);
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                player.getWorld().createExplosion(player.getEyeLocation(), 10, false);
+                                player.damage(10, mob);
+                            }
+                        }.runTaskLater(plugin, 20);
+                    }
+                }
+            }
+        }.runTaskLater(plugin, 20);
     }
 
-    private void onSkill3(Room room) {
+    private void onSkill3(Room room, LivingEntity mob) {
         Utli.sendAllPlayers(room, "§6§l[提示]:§a异界恶魔正在用他的恶魔之眼锁定玩家！请尽快远离！");
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (room.getStatus() != RoomStatus.WAITING && mob.getHealth() > 0) {
+                    Location mobLocation = mob.getEyeLocation();
+                    Player nearest = null;
+                    double distance = 0;
+                    for (Player player : room.getAlivePlayer()) {
+                        System.out.println(player.getName() + " " + player.getLocation().distance(mobLocation));
+                        if (nearest == null || nearest.getLocation().distance(mobLocation) < distance) {
+                            nearest = player;
+                            distance = player.getLocation().distance(mobLocation);
+                        }
+
+                    }
+                    if (nearest != null) {
+                        Utli.sendAllPlayers(room, "§6§l[提示]:§a异界恶魔锁定了" + nearest.getName());
+                        nearest.setHealth(0);
+                    }
+                }
+            }
+        }.runTaskLater(plugin, 20);
     }
 }

@@ -38,7 +38,7 @@ class Protector extends Mob {
     }
 
     private static final PotionEffect SPEED = new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1, false);
-    private static final PotionEffect BLINDNESS = new PotionEffect(PotionEffectType.BLINDNESS, 1, 1, false);
+    private static final PotionEffect BLINDNESS = new PotionEffect(PotionEffectType.BLINDNESS, 1 * 20, 1, false);
 
     @Override
     public LivingEntity spawn(Location loc) {

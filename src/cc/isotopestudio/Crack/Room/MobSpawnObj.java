@@ -81,8 +81,10 @@ public class MobSpawnObj {
 
 
     public void clear() {
-        if (task != null)
+        if (task != null) {
             task.cancel();
+            task = null;
+        }
         for (LivingEntity mob : mobs) {
             mob.setHealth(0);
         }

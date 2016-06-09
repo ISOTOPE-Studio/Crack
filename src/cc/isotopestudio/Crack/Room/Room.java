@@ -350,10 +350,25 @@ public class Room {
         return count;
     }
 
+    public Set<Player> getAlivePlayer() {
+        Set<Player> players = new HashSet<>();
+        for (String playerName : playersStatus.keySet()) {
+            Player player = Bukkit.getPlayer(playerName);
+            if (player == null || player.getHealth() == 0) continue;
+            if (playersStatus.get(playerName) != PlayerStatus.GAME) continue;
+            players.add(player);
+        }
+        return players;
+    }
+
     public void setPlayerStatus(String playerName, PlayerStatus status) {
         if (players.contains(playerName)) {
             playersStatus.put(playerName, status);
         }
+    }
+
+    public PlayerStatus getPlayerStatus(String playerName) {
+        return playersStatus.get(playerName);
     }
 
     @Override

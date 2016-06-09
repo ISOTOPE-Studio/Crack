@@ -36,7 +36,7 @@ class Guardian extends Mob {
     }
 
     private static final PotionEffect SPEED = new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2, false);
-    private static final PotionEffect WITHER = new PotionEffect(PotionEffectType.WITHER, 3, 1, false);
+    private static final PotionEffect WITHER = new PotionEffect(PotionEffectType.WITHER, 3 * 20, 1, false);
 
     @Override
     public LivingEntity spawn(Location loc) {
