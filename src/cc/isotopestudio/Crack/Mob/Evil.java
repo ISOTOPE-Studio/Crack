@@ -1,5 +1,6 @@
 package cc.isotopestudio.Crack.mob;
 
+import cc.isotopestudio.Crack.debugGUI.LogGUI;
 import cc.isotopestudio.Crack.room.Room;
 import cc.isotopestudio.Crack.type.RoomStatus;
 import cc.isotopestudio.Crack.utli.ParticleEffect;
@@ -56,7 +57,7 @@ class Evil extends Mob implements Listener {
     Evil() {
         super("Evil", EntityType.WITHER);
         displayName = S.toRed("[BOSS]异界恶魔");
-        health = 2048;
+        health = 100;
         attack = 2;
     }
 
@@ -92,13 +93,16 @@ class Evil extends Mob implements Listener {
 
     @Override
     public void onSkill(Room room, LivingEntity mob) {
-        System.out.println(1);
-        if (Utli.random(3)) {
+        fireParticle(mob, 3);
+        if (Utli.random(30)) {
             onSkill1(room, mob);
-        } else if (Utli.random(6)) {
+            LogGUI.addInfo("Mob Evil-on Skill 1 in "+room.getName());
+        } else if (Utli.random(60)) {
             onSkill2(room, mob);
-        } else if (Utli.random(9)) {
+            LogGUI.addInfo("Mob Evil-on Skill 2 in "+room.getName());
+        } else if (Utli.random(90)) {
             onSkill3(room, mob);
+            LogGUI.addInfo("Mob Evil-on Skill 3 in "+room.getName());
         }
     }
 
@@ -110,7 +114,6 @@ class Evil extends Mob implements Listener {
         for (Player player : room.getAlivePlayer()) {
             player.addPotionEffect(SLOW);
             player.addPotionEffect(BLINDNESS);
-            System.out.println("player" + player.getName() + ": " + SLOW + BLINDNESS);
         }
     }
 
@@ -127,36 +130,60 @@ class Evil extends Mob implements Listener {
                         Player player = (Player) entity;
                         if (!room.getAlivePlayer().contains(player)) continue;
                         player.sendMessage("§6§l[提示]:§c你被异界恶魔的恶魔之力所吸引了！");
-                        ParticleEffect.PORTAL.display(0, 0, 0, 1, 20, player.getEyeLocation(), 50);
-                        Vector v = mob.getEyeLocation().subtract(player.getEyeLocation()).toVector().normalize().multiply(2);
-                        player.setVelocity(v);
+                        for (int i = 0; i < 10; i++)
+                            ParticleEffect.PORTAL.display((float) (Math.random() * 2), (float) (Math.random() * 2), (float) (Math.random() * 2), 5, 50, player.getEyeLocation(), 50);
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                player.getWorld().createExplosion(player.getEyeLocation(), 10, false);
-                                player.damage(10, mob);
+                                if (room.getStatus() != RoomStatus.WAITING && mob.getHealth() > 0) {
+                                    Vector v = mob.getEyeLocation().subtract(player.getEyeLocation()).toVector().normalize().multiply(2);
+                                    player.setVelocity(v);
+                                    fireParticle(player, 20);
+                                }
                             }
                         }.runTaskLater(plugin, 20);
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                if (room.getStatus() != RoomStatus.WAITING && mob.getHealth() > 0) {
+                                    player.getWorld().createExplosion(player.getEyeLocation(), 0, false);
+                                    player.damage(10, mob);
+                                }
+                            }
+                        }.runTaskLater(plugin, 40);
                     }
                 }
             }
         }.runTaskLater(plugin, 20);
     }
 
+    private void fireParticle(Entity entity, int count) {
+        if (count > 0)
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    ParticleEffect.FLAME.display(0, 0, 0, 0, 5 * (21 - count), entity.getLocation(), 50);
+                    fireParticle(entity, count - 1);
+                }
+            }.runTaskLater(plugin, 1);
+    }
+
     private void onSkill3(Room room, LivingEntity mob) {
         Utli.sendAllPlayers(room, "§6§l[提示]:§a异界恶魔正在用他的恶魔之眼锁定玩家！请尽快远离！");
+        System.out.print(mob);
         new BukkitRunnable() {
             @Override
             public void run() {
                 if (room.getStatus() != RoomStatus.WAITING && mob.getHealth() > 0) {
                     Location mobLocation = mob.getEyeLocation();
                     Player nearest = null;
-                    double distance = 0;
+                    double nearDistance = 0;
                     for (Player player : room.getAlivePlayer()) {
-                        System.out.println(player.getName() + " " + player.getLocation().distance(mobLocation));
-                        if (nearest == null || nearest.getLocation().distance(mobLocation) < distance) {
+                        double distance = player.getLocation().distance(mobLocation);
+                        if (nearest == null || distance < nearDistance) {
+                            System.out.println("nearest" + nearest);
                             nearest = player;
-                            distance = player.getLocation().distance(mobLocation);
+                            nearDistance = distance;
                         }
 
                     }

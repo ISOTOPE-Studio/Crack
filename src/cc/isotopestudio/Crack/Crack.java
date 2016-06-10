@@ -3,6 +3,8 @@ package cc.isotopestudio.Crack;
 import cc.isotopestudio.Crack.command.CrackAdminCommand;
 import cc.isotopestudio.Crack.command.CrackCommand;
 import cc.isotopestudio.Crack.data.Settings;
+import cc.isotopestudio.Crack.debugGUI.LogGUI;
+import cc.isotopestudio.Crack.debugGUI.SettingsGUI;
 import cc.isotopestudio.Crack.listener.ListenerManager;
 import cc.isotopestudio.Crack.mob.Mob;
 import cc.isotopestudio.Crack.room.Room;
@@ -10,6 +12,7 @@ import cc.isotopestudio.Crack.task.TaskManager;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -51,14 +54,15 @@ public class Crack extends JavaPlugin {
         this.getCommand("CrackAdmin").setExecutor(new CrackAdminCommand());
         this.getCommand("Crack").setExecutor(new CrackCommand());
 
-        new InfoGUI().run();
-        InfoGUI.text.setWrapStyleWord(true);
+        new SettingsGUI().run();
+        new LogGUI().run();
+        SettingsGUI.text.setWrapStyleWord(true);
         new BukkitRunnable() {
             @Override
             public void run() {
-                InfoGUI.text.setText("");
+                SettingsGUI.text.setText("");
                 for (Room room : Room.rooms.values())
-                    InfoGUI.text.append(room.toString() + "\n");
+                    SettingsGUI.text.append(room.toString() + "\n");
             }
         }.runTaskTimer(this, 20, 20);
 
@@ -70,6 +74,8 @@ public class Crack extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        LogGUI.on(false);
+        SettingsGUI.on(false);
         getLogger().info(pluginName + "≥…π¶–∂‘ÿ!");
     }
 

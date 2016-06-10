@@ -1,5 +1,6 @@
 package cc.isotopestudio.Crack.data;
 
+import cc.isotopestudio.Crack.debugGUI.LogGUI;
 import cc.isotopestudio.Crack.room.Room;
 import cc.isotopestudio.Crack.type.LocationType;
 import cc.isotopestudio.Crack.utli.S;
@@ -31,7 +32,7 @@ public class PlayerData {
 
     public static void addTime(String playerName) {
         int count = plugin.getPlayerData().getInt("player.times");
-        plugin.getPlayerData().set("player.times",++count);
+        plugin.getPlayerData().set("player.times", ++count);
         plugin.savePlayerData();
     }
 
@@ -45,22 +46,26 @@ public class PlayerData {
                 Utli.sendAllPlayers(room, S.toPrefixGreen(player.getName() + " 加入房间"));
                 room.addPlayer(player.getName());
                 player.teleport(room.getLobby());
+                LogGUI.addInfo("PlayerData-Teleport " + player.getName() + " to LOBBY of " + room.getName());
                 break;
             }
             case GAME: {
                 plugin.getPlayerData().set(player.getName() + ".type", type.name());
                 player.teleport(room.getSpawn());
+                LogGUI.addInfo("PlayerData-Teleport " + player.getName() + " to GAME of " + room.getName());
                 break;
             }
             case RESPAWN: {
                 plugin.getPlayerData().set(player.getName() + ".type", type.name());
                 player.teleport(room.getRespawn());
                 Utli.sendAllPlayers(room, S.toPrefixRed(player.getName() + " 等待复活"));
+                LogGUI.addInfo("PlayerData-Teleport " + player.getName() + " to RESPAWN of " + room.getName());
                 break;
             }
             case BOSS: {
                 plugin.getPlayerData().set(player.getName() + ".type", type.name());
                 player.teleport(room.getBossObj().getLocation());
+                LogGUI.addInfo("PlayerData-Teleport " + player.getName() + " to BOSS of " + room.getName());
                 break;
             }
             case NONE: {
@@ -68,6 +73,7 @@ public class PlayerData {
                     player.teleport(Utli.stringToLocation(plugin.getPlayerData().getString(player.getName() + ".location")));
                     System.out.println(Utli.stringToLocation(plugin.getPlayerData().getString(player.getName() + ".location")));
                     plugin.getPlayerData().set(player.getName(), null);
+                    LogGUI.addInfo("PlayerData-Teleport " + player.getName() + " to OUT of " + room.getName());
                     room.removePlayer(player.getName());
                 }
                 break;

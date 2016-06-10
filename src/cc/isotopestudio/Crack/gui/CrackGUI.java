@@ -1,6 +1,7 @@
 package cc.isotopestudio.Crack.gui;
 
 import cc.isotopestudio.Crack.data.PlayerData;
+import cc.isotopestudio.Crack.debugGUI.LogGUI;
 import cc.isotopestudio.Crack.room.Room;
 import cc.isotopestudio.Crack.type.LocationType;
 import cc.isotopestudio.Crack.type.RoomStatus;
@@ -70,6 +71,7 @@ public class CrackGUI extends GUI {
                 } else {
                     PlayerData.teleport(player, room, LocationType.LOBBY);
                     player.sendMessage(S.toPrefixGreen("传送到游戏大厅"));
+                    LogGUI.addInfo("Room " + room.getName() + "-player " + player.getName() + " join " + room.getName());
                 }
             }
             if (e.willClose()) {

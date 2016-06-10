@@ -28,7 +28,7 @@ class MobListener implements Listener {
             }
 
             for (MobSpawnObj mobSpawnObj : room.getMobSpawnObj())
-                if (mobSpawnObj.getMobs().remove(event.getEntity())) {
+                if (mobSpawnObj.remove(event.getEntity())) {
                     room.mobsKillCount++;
                     event.setDroppedExp(0);
                     event.getDrops().clear();

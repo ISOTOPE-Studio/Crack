@@ -24,6 +24,12 @@ class GameTask extends BukkitRunnable {
                 count.put(room, 0);
             else
                 count.put(room, count.get(room) + 1);
+            if (room.getStatus() == RoomStatus.BOSS) {
+                if (room.getAlivePlayersNum() == 0) {
+                    room.lose();
+                    continue;
+                }
+            }
             if (room.getStatus() != RoomStatus.PROGRESS)
                 continue;
             if (room.getAlivePlayersNum() == 0) {

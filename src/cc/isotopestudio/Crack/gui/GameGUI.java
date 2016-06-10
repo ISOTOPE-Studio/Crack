@@ -1,6 +1,7 @@
 package cc.isotopestudio.Crack.gui;
 
 import cc.isotopestudio.Crack.data.PlayerData;
+import cc.isotopestudio.Crack.debugGUI.LogGUI;
 import cc.isotopestudio.Crack.room.Room;
 import cc.isotopestudio.Crack.type.LocationType;
 import cc.isotopestudio.Crack.utli.S;
@@ -36,6 +37,7 @@ public class GameGUI extends GUI {
             PlayerData.teleport(player, room, LocationType.NONE);
             player.sendMessage(S.toPrefixGreen("ÍË³ö¾º¼¼³¡"));
             player.closeInventory();
+            LogGUI.addInfo("Room " + room.getName() + "-player " + player.getName() + " exit " + room.getName());
         }
     }
 

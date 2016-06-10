@@ -1,8 +1,11 @@
 package cc.isotopestudio.Crack.command;
 
+import cc.isotopestudio.Crack.debugGUI.LogGUI;
+import cc.isotopestudio.Crack.debugGUI.SettingsGUI;
 import cc.isotopestudio.Crack.mob.Mob;
 import cc.isotopestudio.Crack.room.MobSpawnObj;
 import cc.isotopestudio.Crack.room.Room;
+import cc.isotopestudio.Crack.utli.ParticleEffect;
 import cc.isotopestudio.Crack.utli.S;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,16 +19,30 @@ public class CrackAdminCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("crackadmin")) {
+            if (!sender.hasPermission("crack.admin")) {
+                sender.sendMessage(S.toPrefixRed("你没有权限"));
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("debug") && args.length > 1) {
+                if (args[1].equalsIgnoreCase("on")) {
+                    SettingsGUI.on(true);
+                    LogGUI.on(true);
+                    return true;
+                }
+                if (args[1].equalsIgnoreCase("off")) {
+                    SettingsGUI.on(false);
+                    LogGUI.on(false);
+                    return true;
+                }
+            }
             if (!(sender instanceof Player)) {
                 sender.sendMessage(S.toPrefixRed("必须要玩家才能执行"));
                 sendHelpPage1(sender, label);
                 return true;
             }
             Player player = (Player) sender;
-            if (!player.hasPermission("crack.admin")) {
-                sender.sendMessage(S.toPrefixRed("你没有权限"));
-                return true;
-            }
+            for (int i = 0; i < 10; i++)
+                ParticleEffect.PORTAL.display((float) (Math.random() * 2), (float) (Math.random() * 2), (float) (Math.random() * 2), 5, 50, player.getEyeLocation(), 50);
             if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
                 if (args.length > 1) {
                     if (args[1].equalsIgnoreCase("2")) {

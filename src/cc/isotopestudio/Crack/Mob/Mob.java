@@ -1,5 +1,6 @@
 package cc.isotopestudio.Crack.mob;
 
+import cc.isotopestudio.Crack.debugGUI.LogGUI;
 import cc.isotopestudio.Crack.room.Room;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;

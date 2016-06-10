@@ -1,5 +1,6 @@
 package cc.isotopestudio.Crack.room;
 
+import cc.isotopestudio.Crack.debugGUI.LogGUI;
 import cc.isotopestudio.Crack.mob.Mob;
 import cc.isotopestudio.Crack.utli.Utli;
 import org.bukkit.Location;
@@ -65,6 +66,7 @@ public class MobSpawnObj {
 
     public void spawn() {
         mobs.add(mob.spawn(loc));
+        LogGUI.addInfo("Mob " + mob.getName() + "-spawn in " + room.getName());
         if (task == null) { // First run
             task = new BukkitRunnable() {
                 @Override
@@ -79,6 +81,9 @@ public class MobSpawnObj {
         count++;
     }
 
+    public boolean remove(LivingEntity mob) {
+        return mobs.remove(mob);
+    }
 
     public void clear() {
         if (task != null) {

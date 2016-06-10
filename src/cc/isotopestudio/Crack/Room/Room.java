@@ -1,6 +1,7 @@
 package cc.isotopestudio.Crack.room;
 
 import cc.isotopestudio.Crack.data.PlayerData;
+import cc.isotopestudio.Crack.debugGUI.LogGUI;
 import cc.isotopestudio.Crack.mob.Mob;
 import cc.isotopestudio.Crack.type.LocationType;
 import cc.isotopestudio.Crack.type.PlayerStatus;
@@ -269,6 +270,7 @@ public class Room {
         for (int i = 0; i < 10; i++) {
             sendAllPlayers(this, "");
         }
+        LogGUI.addInfo("Room " + getName() + "-start");
     }
 
     public void boss() {
@@ -289,7 +291,7 @@ public class Room {
             sendAllPlayersTitle(this, S.toBoldRed("红色警报"), S.toRed("还有5秒 BOSS来临!"));
             PlayerData.teleport(player, this, LocationType.BOSS);
         }
-
+        LogGUI.addInfo("Room " + getName() + "-BOSS");
     }
 
     public void win() {
@@ -315,11 +317,13 @@ public class Room {
                 Bukkit.dispatchCommand(console, commands[i]);
             }
         }
+        LogGUI.addInfo("Room " + getName() + "-WON");
         end();
     }
 
     public void lose() {
         new SendTitleTask(this).runTaskLater(plugin, 20);
+        LogGUI.addInfo("Room " + getName() + "-LOSE");
         end();
     }
 
@@ -331,6 +335,7 @@ public class Room {
         }
         clearPlayers();
         setStatus(RoomStatus.WAITING);
+        LogGUI.addInfo("Room " + getName() + "-end");
     }
 
     public long getScheduleStart() {
@@ -381,7 +386,7 @@ public class Room {
                 "\nlobby=" + (lobby != null) +
                 "\nspawn=" + (spawn != null) +
                 "\nrespawn=" + (respawn != null) +
-                "\nbossObj=" + (bossObj != null) +
+                "\nbossObj=" + (bossObj != null ? bossObj.toString() : "null") +
                 "\nstatus=" + status +
                 "\nminPlayer=" + minPlayer +
                 "\nmaxPlayer=" + maxPlayer +
