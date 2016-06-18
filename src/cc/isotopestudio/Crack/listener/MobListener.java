@@ -23,6 +23,8 @@ class MobListener implements Listener {
             }
             if (room.getBossObj().getMobs().size() > 0 &&
                     room.getBossObj().getMobs().contains(event.getEntity())) {
+                event.setDroppedExp(0);
+                event.getDrops().clear();
                 room.getBossObj().clear();
                 room.win();
             }

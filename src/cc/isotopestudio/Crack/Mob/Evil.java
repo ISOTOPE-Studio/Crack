@@ -55,9 +55,9 @@ class Evil extends Mob implements Listener {
     */
 
     Evil() {
-        super("Evil", EntityType.WITHER);
+        super("Evil", EntityType.SKELETON);
         displayName = S.toRed("[BOSS]Òì½ç¶ñÄ§");
-        health = 100;
+        health = 2048;
         attack = 2;
     }
 
@@ -66,7 +66,8 @@ class Evil extends Mob implements Listener {
 
     @Override
     public LivingEntity spawn(Location loc) {
-        LivingEntity entity = super.spawn(loc);
+        Skeleton entity = (Skeleton) super.spawn(loc);
+        entity.setSkeletonType(Skeleton.SkeletonType.WITHER);
         entity.addPotionEffect(SPEED);
         return entity;
     }
@@ -96,13 +97,15 @@ class Evil extends Mob implements Listener {
         fireParticle(mob, 3);
         if (Utli.random(30)) {
             onSkill1(room, mob);
-            LogGUI.addInfo("Mob Evil-on Skill 1 in "+room.getName());
-        } else if (Utli.random(60)) {
+            LogGUI.addInfo("Mob Evil-on Skill 1 in " + room.getName());
+        }
+        if (Utli.random(60)) {
             onSkill2(room, mob);
-            LogGUI.addInfo("Mob Evil-on Skill 2 in "+room.getName());
-        } else if (Utli.random(90)) {
+            LogGUI.addInfo("Mob Evil-on Skill 2 in " + room.getName());
+        }
+        if (Utli.random(90)) {
             onSkill3(room, mob);
-            LogGUI.addInfo("Mob Evil-on Skill 3 in "+room.getName());
+            LogGUI.addInfo("Mob Evil-on Skill 3 in " + room.getName());
         }
     }
 

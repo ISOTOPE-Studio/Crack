@@ -36,13 +36,8 @@ class GameTask extends BukkitRunnable {
                 room.lose();
                 continue;
             }
-            if (room.mobsKillCount > 20) {
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        room.boss();
-                    }
-                }.runTaskLater(plugin, 20);
+            if (room.mobsKillCount >= room.getKillRequire()) {
+                room.boss();
                 continue;
             }
             for (MobSpawnObj mobSpawnObj : room.getMobSpawnObj()) {

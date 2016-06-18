@@ -33,7 +33,7 @@ public class Utli {
     }
 
     public static boolean random(int count) {
-        int ran = (int) (Math.random() * 30) + 1;
+        int ran = (int) (Math.random() * count) + 1;
         return count == ran;
     }
 

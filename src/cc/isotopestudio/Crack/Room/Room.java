@@ -27,6 +27,7 @@ public class Room {
     private final String name;
     private final Set<String> players;
     private final HashMap<String, PlayerStatus> playersStatus;
+    private int killRequire;
     public int mobsKillCount = 0;
     private Location lobby;
     private Location spawn;
@@ -62,6 +63,7 @@ public class Room {
         lobby = getLocation("lobby");
         spawn = getLocation("spawn");
         respawn = getLocation("respawn");
+        killRequire = plugin.getRoomData().getInt(name + ".killrequire", 20);
         ConfigurationSection temp = plugin.getRoomData().getConfigurationSection(name + ".bossSpawn");
         if (temp != null) {
             MobSpawnObj bossTemp = deserialize(temp, this);
@@ -210,6 +212,16 @@ public class Room {
         this.maxPlayer = maxPlayer;
         plugin.getRoomData().set(name + ".max", maxPlayer);
         plugin.saveRoomData();
+    }
+
+    public void setKillRequire(int killRequire) {
+        this.killRequire = killRequire;
+        plugin.getRoomData().set(name + ".killrequire", killRequire);
+        plugin.saveRoomData();
+    }
+
+    public int getKillRequire() {
+        return killRequire;
     }
 
     public void addPlayer(String playerName) {
@@ -383,6 +395,7 @@ public class Room {
                 "\nplayers=" + players +
                 "\nplayersStatus=" + playersStatus +
                 "\nmobsKillCount=" + mobsKillCount +
+                "\nkillRequire=" + killRequire +
                 "\nlobby=" + (lobby != null) +
                 "\nspawn=" + (spawn != null) +
                 "\nrespawn=" + (respawn != null) +
@@ -409,7 +422,8 @@ public class Room {
         @Override
         public void run() {
             if (player == null || !player.isOnline()) return;
-            PlayerData.teleport(player, room, LocationType.NONE);
+            if (player.getHealth() > 0)
+                PlayerData.teleport(player, room, LocationType.NONE);
         }
     }
 

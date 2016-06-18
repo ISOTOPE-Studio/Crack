@@ -23,7 +23,7 @@ public class CrackAdminCommand implements CommandExecutor {
                 sender.sendMessage(S.toPrefixRed("你没有权限"));
                 return true;
             }
-            if (args[0].equalsIgnoreCase("debug") && args.length > 1) {
+            if (args.length > 0 && args[0].equalsIgnoreCase("debug") && args.length > 1) {
                 if (args[1].equalsIgnoreCase("on")) {
                     SettingsGUI.on(true);
                     LogGUI.on(true);
@@ -135,14 +135,18 @@ public class CrackAdminCommand implements CommandExecutor {
                     player.sendMessage(S.toPrefixGreen("成功设置 " + args[0] + " 的等待大厅"));
                     return true;
                 }
-                if (args[1].equalsIgnoreCase("boss") && args.length > 2) {
-                    Mob mob = Mob.mobs.get(args[2]);
-                    if (mob == null) {
-                        player.sendMessage(S.toPrefixRed(args[2] + "不是是有效的怪物类型"));
+                if (args[1].equalsIgnoreCase("boss")) {
+                    if (args.length > 2) {
+                        Mob mob = Mob.mobs.get(args[2]);
+                        if (mob == null) {
+                            player.sendMessage(S.toPrefixRed(args[2] + "不是是有效的怪物类型"));
+                            return true;
+                        }
+                        room.setBossLocation(player.getLocation(), mob);
+                        player.sendMessage(S.toPrefixGreen("成功设置 " + args[0] + " 的BOSS生成点"));
                         return true;
                     }
-                    room.setBossLocation(player.getLocation(), mob);
-                    player.sendMessage(S.toPrefixGreen("成功设置 " + args[0] + " 的BOSS生成点"));
+                    player.sendMessage(S.toBoldGreen("/" + label + " <房间名> boss <怪物类型>") + S.toGray(" - ") + S.toGold("设置副本房间BOSS生成点"));
                     return true;
                 }
                 if (args[1].equalsIgnoreCase("mob") && args.length > 2) {
@@ -207,6 +211,22 @@ public class CrackAdminCommand implements CommandExecutor {
                         return true;
                     }
                 }
+                if (args[1].equalsIgnoreCase("kill")) {
+                    int count;
+                    try {
+                        count = Integer.parseInt(args[2]);
+                    } catch (Exception e) {
+                        player.sendMessage(S.toPrefixRed(args[2] + "不是数字"));
+                        return true;
+                    }
+                    if (count < 0) {
+                        player.sendMessage(S.toPrefixRed("不能小于0"));
+                        return true;
+                    }
+                    room.setKillRequire(count);
+                    player.sendMessage(S.toPrefixGreen("成功设置 " + args[0] + "BOSS前需击杀的怪物数量"));
+                    return true;
+                }
                 if (args[1].equalsIgnoreCase("min")) {
                     int min;
                     try {
@@ -257,7 +277,7 @@ public class CrackAdminCommand implements CommandExecutor {
         player.sendMessage(S.toBoldGreen("/" + label + " <房间名> spawn") + S.toGray(" - ") + S.toGold("设置副本房间出生点"));
         player.sendMessage(S.toBoldGreen("/" + label + " <房间名> respawn") + S.toGray(" - ") + S.toGold("设置副本房间重生点"));
         player.sendMessage(S.toBoldGreen("/" + label + " <房间名> lobby") + S.toGray(" - ") + S.toGold("设置副本房间大厅"));
-        player.sendMessage(S.toBoldGreen("/" + label + " <房间名> boss") + S.toGray(" - ") + S.toGold("设置副本房间BOSS生成点"));
+        player.sendMessage(S.toBoldGreen("/" + label + " <房间名> boss <怪物类型>") + S.toGray(" - ") + S.toGold("设置副本房间BOSS生成点"));
         player.sendMessage(S.toYellow("/" + label + " help 2") + S.toGray(" - ") + S.toGold("第二页"));
     }
 
@@ -273,8 +293,9 @@ public class CrackAdminCommand implements CommandExecutor {
 
     private void sendHelpPage3(CommandSender player, String label) {
         player.sendMessage(S.toPrefixGreen("帮助菜单 第 3 页"));
-        player.sendMessage(S.toBoldGreen("/" + label + " min <玩家数量>") + S.toGray(" - ") + S.toGold("副本房间设置副本房间最小玩家数量"));
-        player.sendMessage(S.toBoldGreen("/" + label + " max <玩家数量>") + S.toGray(" - ") + S.toGold("副本房间设置副本房间最大玩家数量"));
+        player.sendMessage(S.toBoldGreen("/" + label + " kill <怪物数量>") + S.toGray(" - ") + S.toGold("设置BOSS前需击杀的怪物数量"));
+        player.sendMessage(S.toBoldGreen("/" + label + " min <玩家数量>") + S.toGray(" - ") + S.toGold("设置副本房间最小玩家数量"));
+        player.sendMessage(S.toBoldGreen("/" + label + " max <玩家数量>") + S.toGray(" - ") + S.toGold("设置副本房间最大玩家数量"));
     }
 
 }
